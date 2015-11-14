@@ -1,6 +1,7 @@
 CREATE TABLE "user"
 (
   userid serial NOT NULL,
+  username character varying(128) UNIQUE,
   email character varying(320),
   password text,
   CONSTRAINT user_pk PRIMARY KEY (userid)

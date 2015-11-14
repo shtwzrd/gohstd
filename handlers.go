@@ -3,9 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -66,5 +65,9 @@ func CommandTagDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 func CommandDelete(w http.ResponseWriter, r *http.Request) {
+	panic("Not yet implemented")
+}
+
+func NotificationIndex(w http.ResponseWriter, r *http.Request) {
 	panic("Not yet implemented")
 }

@@ -1,9 +1,8 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 type Route struct {
@@ -50,49 +49,61 @@ var routes = Routes{
 	Route{
 		"UserShow",
 		"GET",
-		"/api/users/{userId}",
+		"/api/users/{username}",
 		UserShow,
+	},
+	Route{
+		"CommandIndex",
+		"GET",
+		"/api/users/{username}/commands",
+		CommandIndex,
 	},
 	Route{
 		"CommandCreate",
 		"POST",
-		"/api/users/{userId}/commands/",
+		"/api/users/{username}/commands/",
 		CommandCreate,
 	},
 	Route{
 		"CommandTagCreate",
 		"POST",
-		"/api/users/{userId}/commands/{commandId}/tags",
+		"/api/users/{username}/commands/{commandId}/tags",
 		CommandTagCreate,
 	},
 	Route{
 		"UserTagShow",
 		"GET",
-		"/api/users/{userId}/tags",
+		"/api/users/{username}/tags",
 		UserTagShow,
 	},
 	Route{
 		"UserTagRename",
 		"PUT",
-		"/api/users/{userId}/tags/{tagId}",
+		"/api/users/{username}/tags/{tag}",
 		UserTagRename,
 	},
 	Route{
 		"UserTagDelete",
 		"DELETE",
-		"/api/users/{userId}/tags/{tagId}",
-		UserTagCreate,
+		"/api/users/{username}/tags/{tag}",
+		UserTagDelete,
 	},
 	Route{
 		"CommandTagDelete",
 		"DELETE",
-		"/api/users/{userId}/commands/{commandId/tags/{tagId}",
+		"/api/users/{username}/commands/{commandId/tags/{tag}",
 		CommandTagDelete,
 	},
 	Route{
 		"CommandDelete",
 		"DELETE",
-		"/api/users/{userId}/commands/{commandId}",
+		"/api/users/{username}/commands/{commandId}",
 		CommandDelete,
+	},
+	Route{
+		"NotificationIndex",
+		"GET",
+		"/api/users/{username}/notifications",
+		NotificationIndex,
 	},
 }

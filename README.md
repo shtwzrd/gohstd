@@ -1,2 +1,2 @@
 # webgohst
-This code is not from Canada
+Web application enabling `gohst`, the command line history persistence tool 
