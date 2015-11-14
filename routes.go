@@ -7,9 +7,9 @@ import (
 )
 
 type Route struct {
-	Name 		string
-	Method		string
-	Pattern 	string
+	Name        string
+	Method      string
+	Pattern     string
 	HandlerFunc http.HandlerFunc
 }
 
@@ -23,7 +23,7 @@ func NewRouter() *mux.Router {
 
 		handler = route.HandlerFunc
 		handler = Logger(handler, route.Name)
-		
+
 		router.
 			Methods(route.Method).
 			Path(route.Pattern).
@@ -72,10 +72,10 @@ var routes = Routes{
 		UserTagShow,
 	},
 	Route{
-		"UserTagCreate",
+		"UserTagRename",
 		"PUT",
-		"/api/users/{userId}/tags/{tagId}"
-		UserTagCreate,
+		"/api/users/{userId}/tags/{tagId}",
+		UserTagRename,
 	},
 	Route{
 		"UserTagDelete",
