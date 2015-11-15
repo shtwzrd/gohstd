@@ -1,4 +1,6 @@
--- name: create-user-table
+package main
+
+const SqlCreateUserTable = `
 CREATE TABLE IF NOT EXISTS "user"
 (
   userid serial NOT NULL,
@@ -6,25 +8,25 @@ CREATE TABLE IF NOT EXISTS "user"
   email character varying(320),
   password text,
   CONSTRAINT user_pk PRIMARY KEY (userid)
-);
+);`
 
--- name: create-tag-table
+const SqlCreateTagTable = `
 CREATE TABLE IF NOT EXISTS tag
 (
   tagid serial NOT NULL,
   name text,
   CONSTRAINT tag_pk PRIMARY KEY (tagid)
-);
+);`
 
--- name: create-command-table
+const SqlCreateCommandTable = `
 CREATE TABLE IF NOT EXISTS command
 (
   commandid serial NOT NULL,
   commandstring text,
   CONSTRAINT command_pk PRIMARY KEY (commandid)
-);
+);`
 
--- name: create-context-table
+const SqlCreateContextTable = `
 CREATE TABLE IF NOT EXISTS context
 (
   contextid serial NOT NULL,
@@ -33,9 +35,9 @@ CREATE TABLE IF NOT EXISTS context
   shell text,
   directory text,
   CONSTRAINT context_pk PRIMARY KEY (contextid)
-);
+);`
 
--- name: create-configuration-table
+const SqlCreateConfigurationTable = `
 CREATE TABLE IF NOT EXISTS configuration
 (
   configurationid serial NOT NULL,
@@ -46,9 +48,9 @@ CREATE TABLE IF NOT EXISTS configuration
   CONSTRAINT configuration_user_fk FOREIGN KEY (userid)
       REFERENCES "user" (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);
+);`
 
--- name: create-session-table
+const SqlCreateSessionTable = `
 CREATE TABLE IF NOT EXISTS "session"
 (
   sessionid serial NOT NULL,
@@ -58,10 +60,10 @@ CREATE TABLE IF NOT EXISTS "session"
   CONSTRAINT session_context_fk FOREIGN KEY (contextid)
       REFERENCES context (contextid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);
+);`
 
--- name: create-servicelog-table
-create table IF NOT EXISTS servicelog
+const SqlCreateServiceLogTable = `
+create TABLE IF NOT EXISTS servicelog
 (
   requestid serial NOT NULL,
   userid integer,
@@ -70,9 +72,9 @@ create table IF NOT EXISTS servicelog
   CONSTRAINT servicelog_user_fk FOREIGN KEY (userid)
       REFERENCES "user" (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);
+);`
 
--- name: create-notification-table
+const SqlCreateNotificationTable = `
 CREATE TABLE IF NOT EXISTS notification
 (
   notificationid serial NOT NULL,
@@ -82,9 +84,9 @@ CREATE TABLE IF NOT EXISTS notification
   CONSTRAINT notification_user_fk FOREIGN KEY (userid)
       REFERENCES "user" (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);
+);`
 
--- name: create-invocation-table
+const SqlCreateInvocationTable = `
 CREATE TABLE IF NOT EXISTS invocation
 (
   invocationid serial NOT NULL,
@@ -103,8 +105,9 @@ CREATE TABLE IF NOT EXISTS invocation
   CONSTRAINT invocation_user_fk FOREIGN KEY (userid)
       REFERENCES "user" (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);
+);`
 
+const SqlCreateInvocationTagTable = `
 -- name: create-invocationtag-table
 CREATE TABLE IF NOT EXISTS invocationtag
 (
@@ -118,4 +121,4 @@ CREATE TABLE IF NOT EXISTS invocationtag
   CONSTRAINT invocationtag_tag_fk FOREIGN KEY (tagid)
       REFERENCES tag (tagid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);
+);`
