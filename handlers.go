@@ -4,21 +4,37 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/warreq/webgohst/Godeps/_workspace/src/github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
-func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Welcome!")
-}
-
 func CommandIndex(w http.ResponseWriter, r *http.Request) {
-	commands := Commands{
-		Command{Id: 1},
-		Command{Id: 2},
-	}
+	vars := mux.Vars(r)
+	user := vars["username"]
+	verbose := r.URL.Query().Get("verbose") == "true"
 
-	if err := json.NewEncoder(w).Encode(commands); err != nil {
-		panic(err)
+	if verbose {
+		commands, err := GetAllInvocations(user)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+
+		if err := json.NewEncoder(w).Encode(commands); err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	} else {
+		commands, err := GetAllCommands(user)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+
+		if err := json.NewEncoder(w).Encode(commands); err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	}
 }
 

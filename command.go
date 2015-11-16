@@ -4,7 +4,10 @@ import (
 	"time"
 )
 
-type Command struct {
+type Command string
+type Commands []Command
+
+type Invocation struct {
 	Id        int       `json:"id"`
 	SessionId int       `json:"sessionid"`
 	Command   string    `json:"command"`
@@ -17,4 +20,4 @@ type Command struct {
 	Tags      []string  `json:"tags"`
 }
 
-type Commands []Command
+type Invocations []Invocation
