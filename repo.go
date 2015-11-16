@@ -59,14 +59,19 @@ func ensureDb(user string) {
 func queryCommands(rows *sql.Rows, pageSize int) (result Commands, err error) {
 	defer rows.Close()
 	var c string
-	var inc int
-	for rows.Next() && (inc < pageSize || pageSize == 0) {
+	inc := 0
+	if pageSize == 0 {
+		inc = -1
+	}
+	for rows.Next() && inc < pageSize {
 		err = rows.Scan(&c)
 		if err != nil {
 			return
 		}
 		result = append(result, Command(c))
-		inc++
+		if pageSize > 0 {
+			inc++
+		}
 	}
 	err = rows.Err()
 	if err != nil {
@@ -79,10 +84,12 @@ func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err err
 	defer rows.Close()
 	var tmp Invocation
 	var tags string
-	var inc int
-	var x interface{} // for ignoring scan columns
-	for rows.Next() && (inc < pageSize || pageSize == 0) {
-		err = rows.Scan(&x, &tmp.Id, &tmp.SessionId, &tmp.Status, &tmp.Timestamp,
+	inc := 0
+	if pageSize == 0 {
+		inc = -1
+	}
+	for rows.Next() && inc < pageSize {
+		err = rows.Scan(&tmp.Id, &tmp.SessionId, &tmp.Status, &tmp.Timestamp,
 			&tmp.Host, &tmp.User, &tmp.Shell, &tmp.Directory, &tmp.Command, &tags)
 		if err != nil {
 			log.Println(err)
@@ -90,7 +97,9 @@ func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err err
 		}
 		tmp.Tags = strings.Split(tags[1:len(tags)-1], ", ")
 		result = append(result, tmp)
-		inc++
+		if pageSize > 0 {
+			inc++
+		}
 	}
 	err = rows.Err()
 	if err != nil {
@@ -99,8 +108,10 @@ func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err err
 	return
 }
 
-func GetAllInvocations(user string) (result Invocations, err error) {
-	query := `select * from commandhistory where "user" = $1`
+func GetInvocations(user string, pageSize int) (result Invocations, err error) {
+	query := `SELECT invocationid, sessionid, returnstatus, "timestamp", hostname,
+            username, shell, directory, commandstring, tags
+            FROM commandhistory WHERE "user" = $1`
 
 	ensureDb(user)
 	rows, err := dao[user].Query(query, user)
@@ -109,11 +120,11 @@ func GetAllInvocations(user string) (result Invocations, err error) {
 		return
 	}
 
-	return queryInvocations(rows, 0)
+	return queryInvocations(rows, pageSize)
 }
 
-func GetAllCommands(user string) (result Commands, err error) {
-	query := `select commandstring from commandhistory where "user" = $1`
+func GetCommands(user string, pageSize int) (result Commands, err error) {
+	query := `SELECT commandstring FROM commandhistory WHERE "user" = $1`
 
 	ensureDb(user)
 	rows, err := dao[user].Query(query, user)
@@ -121,5 +132,5 @@ func GetAllCommands(user string) (result Commands, err error) {
 		log.Println(err)
 		return
 	}
-	return queryCommands(rows, 0)
+	return queryCommands(rows, pageSize)
 }

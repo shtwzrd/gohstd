@@ -6,34 +6,53 @@ import (
 	"github.com/warreq/webgohst/Godeps/_workspace/src/github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func CommandIndex(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	user := vars["username"]
+	count := r.URL.Query().Get("count")
 	verbose := r.URL.Query().Get("verbose") == "true"
 
-	if verbose {
-		commands, err := GetAllInvocations(user)
+	var pageSize int
+	var err error
+	if count == "" {
+		pageSize = 0
+	} else {
+		pageSize, err = strconv.Atoi(count)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	}
+
+	if verbose {
+		commands, err := GetInvocations(user, pageSize)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 
 		if err := json.NewEncoder(w).Encode(commands); err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	} else {
-		commands, err := GetAllCommands(user)
+		commands, err := GetCommands(user, pageSize)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 
 		if err := json.NewEncoder(w).Encode(commands); err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	}
 }
