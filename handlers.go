@@ -28,32 +28,25 @@ func CommandIndex(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	var commands interface{}
 	if verbose {
-		commands, err := GetInvocations(user, pageSize)
+		commands, err = GetInvocations(user, pageSize)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		if err := json.NewEncoder(w).Encode(commands); err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 	} else {
-		commands, err := GetCommands(user, pageSize)
+		commands, err = GetCommands(user, pageSize)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-
-		if err := json.NewEncoder(w).Encode(commands); err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+	}
+	if err := json.NewEncoder(w).Encode(commands); err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
