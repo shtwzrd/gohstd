@@ -27,7 +27,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	// Create all the Tables, if they do not exist
+	// Create all the Tables, Views if they do not exist
 	tables := []string{
 		SqlCreateUserTable,
 		SqlCreateCommandTable,
@@ -38,7 +38,8 @@ func init() {
 		SqlCreateTagTable,
 		SqlCreateInvocationTagTable,
 		SqlCreateNotificationTable,
-		SqlCreateServiceLogTable}
+		SqlCreateServiceLogTable,
+		SqlCreateCommandHistoryView}
 
 	for _, t := range tables {
 		_, err = dao[AppDB].Exec(t)

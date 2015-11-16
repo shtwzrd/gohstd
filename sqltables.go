@@ -108,12 +108,11 @@ CREATE TABLE IF NOT EXISTS invocation
 );`
 
 const SqlCreateInvocationTagTable = `
--- name: create-invocationtag-table
 CREATE TABLE IF NOT EXISTS invocationtag
 (
   refid serial NOT NULL,
-  tagid integer,
-  invocationid integer,
+  tagid integer NOT NULL,
+  invocationid integer NOT NULL,
   CONSTRAINT invocationtag_pk PRIMARY KEY (refid),
   CONSTRAINT invocationtag_invocation_fk FOREIGN KEY (invocationid)
       REFERENCES invocation (invocationid) MATCH SIMPLE
