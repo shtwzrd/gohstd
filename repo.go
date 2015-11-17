@@ -132,16 +132,12 @@ func InsertInvocation(user string, inv Invocation) (err error) {
 
 	switch {
 	case err == sql.ErrNoRows:
-		r, err2 := tx.Exec(`INSERT INTO command (commandstring) VALUES ($1)`,
-			inv.Command)
+		err2 := tx.QueryRow(`INSERT INTO command (commandstring)
+ VALUES ($1) RETURNING commandid`, inv.Command).Scan(&cmdid)
 		if err2 != nil {
 			return err2
 		}
-		i, err3 := r.LastInsertId()
-		if err3 != nil {
-			return err3
-		}
-		cmdid = int(i)
+		break
 	case err != nil:
 		tx.Rollback()
 		return
@@ -149,22 +145,19 @@ func InsertInvocation(user string, inv Invocation) (err error) {
 
 	var ctxid int
 	err = tx.QueryRow(`SELECT contextid FROM context WHERE
- hostname=$1 AND username=$2 AND shell=$3 AND directory=$4`,
+ hostname = $1 AND username = $2 AND shell = $3 AND directory = $4`,
 		inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&ctxid)
 
 	switch {
 	case err == sql.ErrNoRows:
-		r, err2 := tx.Exec(`INSERT INTO context (hostname, username, shell, directory)
- VALUES ($1, $2, $3, $4)`, inv.Host, inv.User, inv.Shell, inv.Directory)
+		err2 := tx.QueryRow(`INSERT INTO context
+ (hostname, username, shell, directory) VALUES ($1, $2, $3, $4)
+ RETURNING contextid`,
+			inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&ctxid)
 		if err2 != nil {
 			return err2
 		}
-		i, err3 := r.LastInsertId()
-		if err3 != nil {
-			return err3
-		}
-		ctxid = int(i)
-
+		break
 	case err != nil:
 		tx.Rollback()
 		return
@@ -172,22 +165,16 @@ func InsertInvocation(user string, inv Invocation) (err error) {
 
 	var sessionid int
 	err = tx.QueryRow(`SELECT sessionid FROM "session" WHERE
- contextid=$1`,
-		inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&sessionid)
+ contextid=$1`, ctxid).Scan(&sessionid)
 
 	switch {
 	case err == sql.ErrNoRows:
-		r, err2 := tx.Exec(`INSERT INTO "session" (contextid,"timestamp")
- VALUES($1, $2)`, ctxid, inv.Timestamp)
+		err2 := tx.QueryRow(`INSERT INTO "session" (contextid,"timestamp")
+ VALUES($1, $2) RETURNING sessionid`, ctxid, inv.Timestamp).Scan(&sessionid)
 		if err2 != nil {
 			return err2
 		}
-		i, err3 := r.LastInsertId()
-		if err3 != nil {
-			return err3
-		}
-		sessionid = int(i)
-
+		break
 	case err != nil:
 		tx.Rollback()
 		return
@@ -195,8 +182,8 @@ func InsertInvocation(user string, inv Invocation) (err error) {
 
 	// Finally insert the invocation
 	_, err = tx.Exec(`INSERT INTO invocation
- (userid, commandid, returnstatus, "timestamp", sessiond)
- VALUES($1, $2, $3, $4, $5)`, uid, cmdid, inv.Status, inv.Timestamp, sessionid)
+ (userid, commandid, returnstatus, "timestamp", sessionid)
+ VALUES ($1, $2, $3, $4, $5)`, uid, cmdid, inv.Status, inv.Timestamp, sessionid)
 
 	if err != nil {
 		tx.Rollback()

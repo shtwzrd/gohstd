@@ -56,7 +56,7 @@ var routes = Routes{
 	Route{
 		"CommandCreate",
 		"POST",
-		"/api/users/{username}/commands/",
+		"/api/users/{username}/commands",
 		CommandCreate,
 	},
 	Route{

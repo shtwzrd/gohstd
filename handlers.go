@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/warreq/webgohst/Godeps/_workspace/src/github.com/gorilla/mux"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -46,12 +48,6 @@ func CommandIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CommandShow(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	commandId := vars["commandId"]
-	fmt.Fprintln(w, "Command show: ", commandId)
-}
-
 func UserRegister(w http.ResponseWriter, r *http.Request) {
 	panic("Not yet implemented")
 }
@@ -61,7 +57,42 @@ func UserShow(w http.ResponseWriter, r *http.Request) {
 }
 
 func CommandCreate(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
+	vars := mux.Vars(r)
+	user := vars["username"]
+
+	var inv Invocation
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, fmt.Sprint(err))
+		log.Println(err)
+		return
+	}
+	if err := r.Body.Close(); err != nil {
+		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, fmt.Sprint(err))
+		return
+	}
+	if err := json.Unmarshal(body, &inv); err != nil {
+		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
+		w.WriteHeader(422) // unprocessable entity
+		fmt.Fprintf(w, fmt.Sprint(err))
+		log.Println(err)
+		return
+	}
+
+	err = InsertInvocation(user, inv)
+	if err != nil {
+		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, fmt.Sprint(err))
+		log.Println(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusCreated)
 }
 
 func CommandTagCreate(w http.ResponseWriter, r *http.Request) {
