@@ -125,83 +125,103 @@ func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err err
 	return
 }
 
-func InsertInvocation(user string, inv Invocation) (err error) {
+func InsertInvocations(user string, invocs Invocations) (err error) {
 	ensureDb(user)
 	tx, err := dao[user].Begin()
 	if err != nil {
 		return
 	}
-
-	var uid int
-	err = tx.QueryRow(`SELECT userid FROM "user" WHERE username=$1`,
-		user).Scan(&uid)
-	if err != nil {
-		return
+	for _, inv := range invocs {
+		err = invocationTx(tx, user, inv)
+		if err != nil {
+			tx.Rollback()
+			return
+		}
 	}
+	tx.Commit()
+	return
+}
+
+func invocationTx(tx *sql.Tx, user string, inv Invocation) (err error) {
+	var uid int
+	err = tx.QueryRow(`
+        SELECT userid FROM "user" WHERE username=$1`, user).Scan(&uid)
 
 	var cmdid int
-	err = tx.QueryRow(`SELECT commandid FROM command WHERE commandstring=$1`,
-		inv.Command).Scan(&cmdid)
+	err = tx.QueryRow(`
+        SELECT commandid FROM command WHERE commandstring=$1`, inv.Command).
+		Scan(&cmdid)
 
-	switch {
-	case err == sql.ErrNoRows:
-		err2 := tx.QueryRow(`INSERT INTO command (commandstring)
- VALUES ($1) RETURNING commandid`, inv.Command).Scan(&cmdid)
+	if err == sql.ErrNoRows {
+		err2 := tx.QueryRow(`
+            INSERT INTO command (commandstring) VALUES ($1) RETURNING commandid`,
+			inv.Command).Scan(&cmdid)
 		if err2 != nil {
 			return err2
 		}
-		break
-	case err != nil:
-		tx.Rollback()
-		return
 	}
 
 	var ctxid int
-	err = tx.QueryRow(`SELECT contextid FROM context WHERE
- hostname = $1 AND username = $2 AND shell = $3 AND directory = $4`,
+	err = tx.QueryRow(`
+        SELECT contextid FROM context
+        WHERE hostname = $1 AND username = $2 AND shell = $3 AND directory = $4`,
 		inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&ctxid)
 
-	switch {
-	case err == sql.ErrNoRows:
-		err2 := tx.QueryRow(`INSERT INTO context
- (hostname, username, shell, directory) VALUES ($1, $2, $3, $4)
- RETURNING contextid`,
+	if err == sql.ErrNoRows {
+		err2 := tx.QueryRow(`
+            INSERT INTO context (hostname, username, shell, directory)
+            VALUES ($1, $2, $3, $4) RETURNING contextid`,
 			inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&ctxid)
 		if err2 != nil {
 			return err2
 		}
-		break
-	case err != nil:
-		tx.Rollback()
-		return
 	}
 
 	var sessionid int
-	err = tx.QueryRow(`SELECT sessionid FROM "session" WHERE
- contextid=$1`, ctxid).Scan(&sessionid)
+	err = tx.QueryRow(`
+        SELECT sessionid FROM "session" WHERE contextid=$1`, ctxid).
+		Scan(&sessionid)
 
-	switch {
-	case err == sql.ErrNoRows:
-		err2 := tx.QueryRow(`INSERT INTO "session" (contextid,"timestamp")
- VALUES($1, $2) RETURNING sessionid`, ctxid, inv.Timestamp).Scan(&sessionid)
+	if err == sql.ErrNoRows {
+		err2 := tx.QueryRow(`
+            INSERT INTO "session" (contextid,"timestamp")
+            VALUES($1, $2) RETURNING sessionid`,
+			ctxid, inv.Timestamp).Scan(&sessionid)
 		if err2 != nil {
 			return err2
 		}
-		break
-	case err != nil:
-		tx.Rollback()
-		return
 	}
 
-	// Finally insert the invocation
-	_, err = tx.Exec(`INSERT INTO invocation
- (userid, commandid, returnstatus, "timestamp", sessionid)
- VALUES ($1, $2, $3, $4, $5)`, uid, cmdid, inv.Status, inv.Timestamp, sessionid)
+	var invid int
+	err = tx.QueryRow(`
+           INSERT INTO invocation
+           (userid, commandid, returnstatus, "timestamp", sessionid)
+           VALUES ($1, $2, $3, $4, $5) RETURNING invocationid`,
+		uid, cmdid, inv.Status, inv.Timestamp, sessionid).Scan(&invid)
 
-	if err != nil {
-		tx.Rollback()
+	for _, tag := range inv.Tags {
+		err = addTag(tx, user, invid, tag)
 	}
-	tx.Commit()
+	return
+}
+
+func addTag(tx *sql.Tx, user string, invid int, tag string) (err error) {
+	var tagid int
+	err = tx.QueryRow(`
+        SELECT tagid FROM tag WHERE name=$1`, tag).Scan(&tagid)
+
+	if err == sql.ErrNoRows {
+		err2 := tx.QueryRow(`
+            INSERT INTO tag (name) VALUES ($1) RETURNING tagid`,
+			tag).Scan(&tagid)
+		if err2 != nil {
+			return err2
+		}
+	}
+
+	_, err = tx.Exec(`
+           INSERT INTO invocationtag (tagid, invocationid)
+           VALUES ($1, $2)`, tagid, invid)
 	return
 }
 

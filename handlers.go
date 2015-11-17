@@ -60,7 +60,7 @@ func CommandCreate(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	user := vars["username"]
 
-	var inv Invocation
+	var inv Invocations
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
@@ -83,7 +83,7 @@ func CommandCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = InsertInvocation(user, inv)
+	err = InsertInvocations(user, inv)
 	if err != nil {
 		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
 		w.WriteHeader(http.StatusBadRequest)
