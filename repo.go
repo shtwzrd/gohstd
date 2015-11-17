@@ -38,6 +38,10 @@ func init() {
 		SqlCreateServiceLogTable,
 		SqlCreateCommandHistoryView}
 
+	procs := []string{
+		SqlInsertNotificationFunction,
+		SqlCommandNotificationTrigger}
+
 	for _, t := range tables {
 		_, err := dao[AppDB].Exec(t)
 		if err != nil {
@@ -45,6 +49,15 @@ func init() {
 			log.Fatal(err)
 		}
 	}
+
+	for _, t := range procs {
+		_, err := dao[AppDB].Exec(t)
+		if err != nil {
+			fmt.Println(t)
+			log.Fatal(err)
+		}
+	}
+
 }
 
 func ensureDb(user string) {
