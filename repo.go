@@ -48,11 +48,15 @@ func init() {
 }
 
 func ensureDb(user string) {
-	var err error
-	dao[user], err = sql.Open("postgres", conn)
+	_, exists := dao[user]
 
-	if err != nil {
-		log.Fatal(err)
+	if !exists {
+		var err error
+		dao[user], err = sql.Open("postgres", conn)
+
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -105,6 +109,99 @@ func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err err
 	if err != nil {
 		log.Println(err)
 	}
+	return
+}
+
+func InsertInvocation(user string, inv Invocation) (err error) {
+	ensureDb(user)
+	tx, err := dao[user].Begin()
+	if err != nil {
+		return
+	}
+
+	var uid int
+	err = tx.QueryRow(`SELECT userid FROM "user" WHERE username=$1`,
+		user).Scan(&uid)
+	if err != nil {
+		return
+	}
+
+	var cmdid int
+	err = tx.QueryRow(`SELECT commandid FROM command WHERE commandstring=$1`,
+		inv.Command).Scan(&cmdid)
+
+	switch {
+	case err == sql.ErrNoRows:
+		r, err2 := tx.Exec(`INSERT INTO command (commandstring) VALUES ($1)`,
+			inv.Command)
+		if err2 != nil {
+			return err2
+		}
+		i, err3 := r.LastInsertId()
+		if err3 != nil {
+			return err3
+		}
+		cmdid = int(i)
+	case err != nil:
+		tx.Rollback()
+		return
+	}
+
+	var ctxid int
+	err = tx.QueryRow(`SELECT contextid FROM context WHERE
+ hostname=$1 AND username=$2 AND shell=$3 AND directory=$4`,
+		inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&ctxid)
+
+	switch {
+	case err == sql.ErrNoRows:
+		r, err2 := tx.Exec(`INSERT INTO context (hostname, username, shell, directory)
+ VALUES ($1, $2, $3, $4)`, inv.Host, inv.User, inv.Shell, inv.Directory)
+		if err2 != nil {
+			return err2
+		}
+		i, err3 := r.LastInsertId()
+		if err3 != nil {
+			return err3
+		}
+		ctxid = int(i)
+
+	case err != nil:
+		tx.Rollback()
+		return
+	}
+
+	var sessionid int
+	err = tx.QueryRow(`SELECT sessionid FROM "session" WHERE
+ contextid=$1`,
+		inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&sessionid)
+
+	switch {
+	case err == sql.ErrNoRows:
+		r, err2 := tx.Exec(`INSERT INTO "session" (contextid,"timestamp")
+ VALUES($1, $2)`, ctxid, inv.Timestamp)
+		if err2 != nil {
+			return err2
+		}
+		i, err3 := r.LastInsertId()
+		if err3 != nil {
+			return err3
+		}
+		sessionid = int(i)
+
+	case err != nil:
+		tx.Rollback()
+		return
+	}
+
+	// Finally insert the invocation
+	_, err = tx.Exec(`INSERT INTO invocation
+ (userid, commandid, returnstatus, "timestamp", sessiond)
+ VALUES($1, $2, $3, $4, $5)`, uid, cmdid, inv.Status, inv.Timestamp, sessionid)
+
+	if err != nil {
+		tx.Rollback()
+	}
+	tx.Commit()
 	return
 }
 
