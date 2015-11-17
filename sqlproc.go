@@ -1,7 +1,7 @@
 package main
 
 const SqlCommandNotificationTrigger = `
-DROP TRIGGER IF EXISTS command_notification ON invocation
+DROP TRIGGER IF EXISTS command_notification ON invocation;
 CREATE TRIGGER command_notification
 AFTER INSERT ON invocation
 FOR EACH ROW EXECUTE PROCEDURE command_notification_insert();
