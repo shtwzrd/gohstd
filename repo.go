@@ -66,6 +66,8 @@ func ensureDb(user string) {
 	if !exists {
 		var err error
 		dao[user], err = sql.Open("postgres", conn)
+		dao[user].SetMaxOpenConns(90)
+		dao[user].SetMaxIdleConns(0)
 
 		if err != nil {
 			log.Fatal(err)
