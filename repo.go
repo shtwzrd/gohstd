@@ -37,27 +37,31 @@ func init() {
 		SqlCreateNotificationTable,
 		SqlCreateServiceLogTable,
 		SqlCreateCommandHistoryView}
+	fmt.Println(tables)
 
 	procs := []string{
 		SqlInsertNotificationFunction,
 		SqlCommandNotificationTrigger}
 
-	for _, t := range tables {
-		_, err := dao[AppDB].Exec(t)
-		if err != nil {
-			fmt.Println(t)
-			log.Fatal(err)
-		}
-	}
+	fmt.Println(procs)
 
-	for _, t := range procs {
-		_, err := dao[AppDB].Exec(t)
-		if err != nil {
-			fmt.Println(t)
-			log.Fatal(err)
-		}
-	}
+	//	for _, t := range tables {
+	//_, err := dao[AppDB].Exec(t)
+	//	if err != nil {
+	//		fmt.Println(t)
+	//		log.Fatal(err)
+	//	}
+	//	}
 
+	//for _, t := range procs {
+	//	_, err := dao[AppDB].Exec(t)
+	//	if err != nil {
+	//		fmt.Println(t)
+	//		log.Fatal(err)
+	//	}
+	//	}
+
+	fmt.Println("init completed")
 }
 
 func ensureDb(user string) {

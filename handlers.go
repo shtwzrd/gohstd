@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/warreq/webgohst/Godeps/_workspace/src/github.com/gorilla/mux"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -61,7 +60,7 @@ func CommandCreate(w http.ResponseWriter, r *http.Request) {
 	user := vars["username"]
 
 	var inv Invocations
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 10485760))
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
 		w.WriteHeader(http.StatusBadRequest)
