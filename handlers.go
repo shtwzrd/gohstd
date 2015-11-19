@@ -61,7 +61,7 @@ func CommandCreate(w http.ResponseWriter, r *http.Request) {
 	user := vars["username"]
 
 	var inv Invocations
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576000))
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 10485760))
 	if err != nil {
 		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
 		w.WriteHeader(http.StatusBadRequest)
