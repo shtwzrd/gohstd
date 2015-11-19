@@ -9,4 +9,4 @@ FROM invocation I INNER JOIN "session" S ON (I.sessionid = S.sessionid)
      INNER JOIN context CT ON (S.contextid = CT.contextid)
      INNER JOIN command CM ON (I.commandid = CM.commandid)
      INNER JOIN "user" U ON (I.userid = U.userid)
-ORDER BY I.timestamp DESC;
+ORDER BY I.invocationid DESC;
