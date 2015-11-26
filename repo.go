@@ -232,9 +232,10 @@ func addTag(tx *sql.Tx, user string, invid int, tag string) (err error) {
 }
 
 func GetInvocations(user string, pageSize int) (result Invocations, err error) {
-	query := `SELECT invocationid, sessionid, returnstatus, "timestamp", hostname,
-            username, shell, directory, commandstring, tags
-            FROM commandhistory WHERE "user" = $1`
+	query := fmt.Sprintf("%s %d",
+		`SELECT invocationid, sessionid, returnstatus, "timestamp", hostname,
+     username, shell, directory, commandstring, tags
+     FROM commandhistory WHERE "user" = $1 LIMIT `, pageSize)
 
 	ensureDb(user)
 	rows, err := dao[user].Query(query, user)
@@ -247,7 +248,8 @@ func GetInvocations(user string, pageSize int) (result Invocations, err error) {
 }
 
 func GetCommands(user string, pageSize int) (result Commands, err error) {
-	query := `SELECT commandstring FROM commandhistory WHERE "user" = $1`
+	query := fmt.Sprintf("%s %d", `SELECT commandstring FROM commandhistory
+                        WHERE "user" = $1 LIMIT`, pageSize)
 
 	ensureDb(user)
 	rows, err := dao[user].Query(query, user)
