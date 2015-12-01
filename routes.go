@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/warreq/webgohst/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
