@@ -95,10 +95,4 @@ var routes = Routes{
 		"/api/users/{username}/commands/{commandId}",
 		CommandDelete,
 	},
-	Route{
-		"NotificationIndex",
-		"GET",
-		"/api/users/{username}/notifications",
-		NotificationIndex,
-	},
 }

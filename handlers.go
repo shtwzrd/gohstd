@@ -94,10 +94,6 @@ func CommandCreate(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func CommandTagCreate(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
-}
-
 func UserTagShow(w http.ResponseWriter, r *http.Request) {
 	panic("Not yet implemented")
 }
@@ -114,14 +110,14 @@ func UserTagDelete(w http.ResponseWriter, r *http.Request) {
 	panic("Not yet implemented")
 }
 
-func CommandTagDelete(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
-}
-
 func CommandDelete(w http.ResponseWriter, r *http.Request) {
 	panic("Not yet implemented")
 }
 
-func NotificationIndex(w http.ResponseWriter, r *http.Request) {
+func CommandTagCreate(w http.ResponseWriter, r *http.Request) {
+	panic("Not yet implemented")
+}
+
+func CommandTagDelete(w http.ResponseWriter, r *http.Request) {
 	panic("Not yet implemented")
 }
