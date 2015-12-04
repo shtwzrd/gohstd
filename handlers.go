@@ -10,6 +10,14 @@ import (
 	"strconv"
 )
 
+/*
+* handlers are functions mapped to a route, which take *http.Request s and a
+* http.ResponseWriter. They are ultimately responsible for taking the Request
+* and constructing the appropriate Response.
+ */
+
+// CommandIndex is the handler for querying a user's commands, along with any
+// query parameters
 func CommandIndex(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	user := vars["username"]

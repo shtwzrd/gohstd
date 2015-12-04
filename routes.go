@@ -5,6 +5,9 @@ import (
 	"net/http"
 )
 
+// Route represents a URI route for the server to support. A definition of a
+// Route declares support for an HTTP endpoint and maps that URI to the
+// appropriate HTTP handler.
 type Route struct {
 	Name        string
 	Method      string
@@ -14,6 +17,8 @@ type Route struct {
 
 type Routes []Route
 
+// NewRouter constructs a *mux.Router based on the routes defined in this
+// package, which can then be passed to the net/http server.
 func NewRouter() *mux.Router {
 
 	router := mux.NewRouter().StrictSlash(true)

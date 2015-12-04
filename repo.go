@@ -9,9 +9,16 @@ import (
 	"strings"
 )
 
+/*
+* a repo[sitory] is the data access layer for the web application
+ */
+
+// dao is a collection of *sql.DB identified by strings (usernames), the point
+// being that each user gets their own connection pool
 var dao map[string]*sql.DB
 var conn string
 
+// AppDB is an identifier for a specific *sql.DB in our dao map
 const AppDB = "_app"
 
 func init() {
@@ -64,13 +71,14 @@ func init() {
 	fmt.Println("init completed")
 }
 
+// ensureDb verifies that we have created a sql.DB object for the given user
 func ensureDb(user string) {
 	_, exists := dao[user]
 
 	if !exists {
 		var err error
 		dao[user], err = sql.Open("postgres", conn)
-		dao[user].SetMaxOpenConns(90)
+		dao[user].SetMaxOpenConns(2)
 		dao[user].SetMaxIdleConns(0)
 
 		if err != nil {
@@ -79,6 +87,7 @@ func ensureDb(user string) {
 	}
 }
 
+// queryCommands is a common handler for implementing paging over Commands
 func queryCommands(rows *sql.Rows, pageSize int) (result Commands, err error) {
 	defer rows.Close()
 	var c string
@@ -103,6 +112,7 @@ func queryCommands(rows *sql.Rows, pageSize int) (result Commands, err error) {
 	return
 }
 
+// queryInvocations is a common handler for implementing paging over Invocations
 func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err error) {
 	defer rows.Close()
 	var tmp Invocation
@@ -131,6 +141,7 @@ func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err err
 	return
 }
 
+// InsertInvocations sets up a transaction for commiting a batch of Invocations
 func InsertInvocations(user string, invocs Invocations) (err error) {
 	ensureDb(user)
 	tx, err := dao[user].Begin()
@@ -148,6 +159,8 @@ func InsertInvocations(user string, invocs Invocations) (err error) {
 	return
 }
 
+// invocationTx handles the insertion of a single Invocation, as part of a batch
+// transaction
 func invocationTx(tx *sql.Tx, user string, inv Invocation) (err error) {
 	var uid int
 	err = tx.QueryRow(`
@@ -206,12 +219,13 @@ func invocationTx(tx *sql.Tx, user string, inv Invocation) (err error) {
 		uid, cmdid, inv.Status, inv.Timestamp, sessionid).Scan(&invid)
 
 	for _, tag := range inv.Tags {
-		err = addTag(tx, user, invid, tag)
+		err = AddTag(tx, user, invid, tag)
 	}
 	return
 }
 
-func addTag(tx *sql.Tx, user string, invid int, tag string) (err error) {
+// AddTag persists a Tag to an Invocation, as part of a transaction.
+func AddTag(tx *sql.Tx, user string, invid int, tag string) (err error) {
 	var tagid int
 	err = tx.QueryRow(`
         SELECT tagid FROM tag WHERE name=$1`, tag).Scan(&tagid)
@@ -231,14 +245,15 @@ func addTag(tx *sql.Tx, user string, invid int, tag string) (err error) {
 	return
 }
 
+// GetInvocations returns the [pageSize] most recent Invocations for the given
+// user
 func GetInvocations(user string, pageSize int) (result Invocations, err error) {
-	query := fmt.Sprintf("%s %d",
-		`SELECT invocationid, sessionid, returnstatus, "timestamp", hostname,
-     username, shell, directory, commandstring, tags
-     FROM commandhistory WHERE "user" = $1 LIMIT `, pageSize)
+	query := `SELECT invocationid, sessionid, returnstatus, "timestamp", hostname,
+            username, shell, directory, commandstring, tags
+            FROM commandhistory WHERE "user" = $1 LIMIT $2`
 
 	ensureDb(user)
-	rows, err := dao[user].Query(query, user)
+	rows, err := dao[user].Query(query, user, pageSize)
 	if err != nil {
 		log.Println(err)
 		return
@@ -247,12 +262,13 @@ func GetInvocations(user string, pageSize int) (result Invocations, err error) {
 	return queryInvocations(rows, pageSize)
 }
 
+// GetCommands returns the [pageSize] most recent Commands for the given user
 func GetCommands(user string, pageSize int) (result Commands, err error) {
-	query := fmt.Sprintf("%s %d", `SELECT commandstring FROM commandhistory
-                        WHERE "user" = $1 LIMIT`, pageSize)
+	query := `SELECT commandstring FROM commandhistory
+            WHERE "user" = $1 LIMIT $2`
 
 	ensureDb(user)
-	rows, err := dao[user].Query(query, user)
+	rows, err := dao[user].Query(query, user, pageSize)
 	if err != nil {
 		log.Println(err)
 		return

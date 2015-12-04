@@ -7,6 +7,8 @@ import (
 type Command string
 type Commands []Command
 
+// Invocation represents a single execution of a command, including its context,
+// exit code and time of execution.
 type Invocation struct {
 	Id        int       `json:"id"`
 	SessionId int       `json:"sessionid"`
