@@ -164,7 +164,7 @@ func invocationTx(tx *sql.Tx, user string, inv Invocation) (err error) {
 	var invid int
 	err = tx.QueryRow(`
            INSERT INTO invocation
-           (username, commandid, exitcode, "timestamp", hostname, user
+           (username, commandid, exitcode, "timestamp", hostname, "user",
            shell, directory)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING invocationid`,
 		user, cmdid, inv.ExitCode, inv.Timestamp,
