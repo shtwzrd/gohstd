@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/lib/pq"
 	"github.com/nleof/goyesql"
 	"log"
@@ -18,6 +17,7 @@ import (
 // being that each user gets their own connection pool
 var dao map[string]*sql.DB
 var ddl goyesql.Queries
+var dml goyesql.Queries
 var conn string
 
 // AppDB is an identifier for a specific *sql.DB in our dao map
@@ -36,14 +36,21 @@ func init() {
 	// Create all the Tables, Views if they do not exist
 	ddl = goyesql.MustParseFile("data/sql/ddl.sql")
 
-	logExec(dao[AppDB], fmt.Sprint(ddl["create-user-table"]))
-	logExec(dao[AppDB], fmt.Sprint(ddl["create-command-table"]))
-	logExec(dao[AppDB], fmt.Sprint(ddl["create-tag-table"]))
-	logExec(dao[AppDB], fmt.Sprint(ddl["create-invocation-table"]))
-	logExec(dao[AppDB], fmt.Sprint(ddl["create-invocationtag-table"]))
-	logExec(dao[AppDB], fmt.Sprint(ddl["create-commandhistory-view"]))
+	logExec(dao[AppDB], (string)(ddl["create-user-table"]))
+	logExec(dao[AppDB], (string)(ddl["create-command-table"]))
+	logExec(dao[AppDB], (string)(ddl["create-tag-table"]))
+	logExec(dao[AppDB], (string)(ddl["create-invocation-table"]))
+	logExec(dao[AppDB], (string)(ddl["create-invocationtag-table"]))
+	logExec(dao[AppDB], (string)(ddl["create-commandhistory-view"]))
+
+	// Load all data-manipulation queries
+	dml = goyesql.MustParseFile("data/sql/queries.sql")
 
 	log.Println("storage init completed")
+}
+
+func ql(identifier string) string {
+	return (string)(dml[(goyesql.Tag)(identifier)])
 }
 
 func logExec(conn *sql.DB, query string) {
@@ -148,27 +155,18 @@ func InsertInvocations(user string, invocs Invocations) (err error) {
 // transaction
 func invocationTx(tx *sql.Tx, user string, inv Invocation) (err error) {
 	var cmdid int
-	err = tx.QueryRow(`
-        SELECT commandid FROM command WHERE commandstring=$1`, inv.Command).
-		Scan(&cmdid)
+	err = tx.QueryRow(ql("get-commandid-by-command"), inv.Command).Scan(&cmdid)
 
 	if err == sql.ErrNoRows {
-		err2 := tx.QueryRow(`
-            INSERT INTO command (commandstring) VALUES ($1) RETURNING commandid`,
-			inv.Command).Scan(&cmdid)
+		err2 := tx.QueryRow(ql("insert-command"), inv.Command).Scan(&cmdid)
 		if err2 != nil {
 			return err2
 		}
 	}
 
 	var invid int
-	err = tx.QueryRow(`
-           INSERT INTO invocation
-           (username, commandid, exitcode, "timestamp", hostname, "user",
-           shell, directory)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING invocationid`,
-		user, cmdid, inv.ExitCode, inv.Timestamp,
-		inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&invid)
+	err = tx.QueryRow(ql("insert-invocation"), user, cmdid, inv.ExitCode,
+		inv.Timestamp, inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&invid)
 
 	for _, tag := range inv.Tags {
 		err = AddTag(tx, user, invid, tag)
@@ -179,33 +177,24 @@ func invocationTx(tx *sql.Tx, user string, inv Invocation) (err error) {
 // AddTag persists a Tag to an Invocation, as part of a transaction.
 func AddTag(tx *sql.Tx, user string, invid int, tag string) (err error) {
 	var tagid int
-	err = tx.QueryRow(`
-        SELECT tagid FROM tag WHERE name=$1`, tag).Scan(&tagid)
+	err = tx.QueryRow(ql("get-tagid-by-name"), tag).Scan(&tagid)
 
 	if err == sql.ErrNoRows {
-		err2 := tx.QueryRow(`
-            INSERT INTO tag (name) VALUES ($1) RETURNING tagid`,
-			tag).Scan(&tagid)
+		err2 := tx.QueryRow(ql("insert-tag"), tag).Scan(&tagid)
 		if err2 != nil {
 			return err2
 		}
 	}
 
-	_, err = tx.Exec(`
-           INSERT INTO invocationtag (tagid, invocationid)
-           VALUES ($1, $2)`, tagid, invid)
+	_, err = tx.Exec(ql("insert-invocationtag"), tagid, invid)
 	return
 }
 
 // GetInvocations returns the [pageSize] most recent Invocations for the given
 // user
 func GetInvocations(user string, pageSize int) (result Invocations, err error) {
-	query := `SELECT invocationid, exitcode, "timestamp", hostname,
-            "user", shell, directory, commandstring, tags
-            FROM commandhistory WHERE username = $1 LIMIT $2`
-
 	ensureDb(user)
-	rows, err := dao[user].Query(query, user, pageSize)
+	rows, err := dao[user].Query(ql("get-invocations-by-user"), user, pageSize)
 	if err != nil {
 		log.Println(err)
 		return
@@ -216,11 +205,8 @@ func GetInvocations(user string, pageSize int) (result Invocations, err error) {
 
 // GetCommands returns the [pageSize] most recent Commands for the given user
 func GetCommands(user string, pageSize int) (result Commands, err error) {
-	query := `SELECT commandstring FROM commandhistory
-            WHERE username = $1 LIMIT $2`
-
 	ensureDb(user)
-	rows, err := dao[user].Query(query, user, pageSize)
+	rows, err := dao[user].Query(ql("get-commands-by-user"), user, pageSize)
 	if err != nil {
 		log.Println(err)
 		return
