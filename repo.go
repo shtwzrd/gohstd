@@ -35,11 +35,25 @@ func init() {
 	// Create all the Tables, Views if they do not exist
 	defs := goyesql.MustParseFile("data/sql/ddl.sql")
 
-	for _, d := range defs {
-		_, err := dao[AppDB].Exec(fmt.Sprint(d))
-		if err != nil {
-			log.Fatal(err)
-		}
+	var err error
+	_, err = fmt.Println("create-user-table")
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-user-table"]))
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-command-table"]))
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-context-table"]))
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-session-table"]))
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-tag-table"]))
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-configuration-table"]))
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-servicelog-table"]))
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-invocation-table"]))
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-invocationtag-table"]))
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-notification-table"]))
+	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-commandhistory-view"]))
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	log.Println("storage init completed")
@@ -52,8 +66,8 @@ func ensureDb(user string) {
 	if !exists {
 		var err error
 		dao[user], err = sql.Open("postgres", conn)
-		dao[user].SetMaxOpenConns(2)
-		dao[user].SetMaxIdleConns(0)
+		dao[user].SetMaxOpenConns(5)
+		dao[user].SetMaxIdleConns(1)
 
 		if err != nil {
 			log.Fatal(err)
