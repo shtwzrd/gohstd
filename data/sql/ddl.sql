@@ -1,6 +1,4 @@
-package main
-
-const SqlCreateUserTable = `
+-- name: create-user-table
 CREATE TABLE IF NOT EXISTS "user"
 (
   userid serial NOT NULL,
@@ -8,25 +6,25 @@ CREATE TABLE IF NOT EXISTS "user"
   email character varying(320),
   password text,
   CONSTRAINT user_pk PRIMARY KEY (userid)
-);`
+);
 
-const SqlCreateTagTable = `
+-- name: create-tag-table
 CREATE TABLE IF NOT EXISTS tag
 (
   tagid serial NOT NULL,
   name text,
   CONSTRAINT tag_pk PRIMARY KEY (tagid)
-);`
+);
 
-const SqlCreateCommandTable = `
+-- name: create-command-table
 CREATE TABLE IF NOT EXISTS command
 (
   commandid serial NOT NULL,
   commandstring text,
   CONSTRAINT command_pk PRIMARY KEY (commandid)
-);`
+);
 
-const SqlCreateContextTable = `
+-- name: create-context-table
 CREATE TABLE IF NOT EXISTS context
 (
   contextid serial NOT NULL,
@@ -35,9 +33,9 @@ CREATE TABLE IF NOT EXISTS context
   shell text,
   directory text,
   CONSTRAINT context_pk PRIMARY KEY (contextid)
-);`
+);
 
-const SqlCreateConfigurationTable = `
+-- name: create-configuration-table
 CREATE TABLE IF NOT EXISTS configuration
 (
   configurationid serial NOT NULL,
@@ -48,9 +46,9 @@ CREATE TABLE IF NOT EXISTS configuration
   CONSTRAINT configuration_user_fk FOREIGN KEY (userid)
       REFERENCES "user" (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);`
+);
 
-const SqlCreateSessionTable = `
+-- name: create-session-table
 CREATE TABLE IF NOT EXISTS "session"
 (
   sessionid serial NOT NULL,
@@ -60,10 +58,10 @@ CREATE TABLE IF NOT EXISTS "session"
   CONSTRAINT session_context_fk FOREIGN KEY (contextid)
       REFERENCES context (contextid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);`
+);
 
-const SqlCreateServiceLogTable = `
-create TABLE IF NOT EXISTS servicelog
+-- name: create-servicelog-table
+create table IF NOT EXISTS servicelog
 (
   requestid serial NOT NULL,
   userid integer,
@@ -72,9 +70,9 @@ create TABLE IF NOT EXISTS servicelog
   CONSTRAINT servicelog_user_fk FOREIGN KEY (userid)
       REFERENCES "user" (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);`
+);
 
-const SqlCreateNotificationTable = `
+-- name: create-notification-table
 CREATE TABLE IF NOT EXISTS notification
 (
   notificationid serial NOT NULL,
@@ -84,9 +82,9 @@ CREATE TABLE IF NOT EXISTS notification
   CONSTRAINT notification_user_fk FOREIGN KEY (userid)
       REFERENCES "user" (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);`
+);
 
-const SqlCreateInvocationTable = `
+-- name: create-invocation-table
 CREATE TABLE IF NOT EXISTS invocation
 (
   invocationid serial NOT NULL,
@@ -105,14 +103,14 @@ CREATE TABLE IF NOT EXISTS invocation
   CONSTRAINT invocation_user_fk FOREIGN KEY (userid)
       REFERENCES "user" (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);`
+);
 
-const SqlCreateInvocationTagTable = `
+-- name: create-invocationtag-table
 CREATE TABLE IF NOT EXISTS invocationtag
 (
   refid serial NOT NULL,
-  tagid integer NOT NULL,
-  invocationid integer NOT NULL,
+  tagid integer,
+  invocationid integer,
   CONSTRAINT invocationtag_pk PRIMARY KEY (refid),
   CONSTRAINT invocationtag_invocation_fk FOREIGN KEY (invocationid)
       REFERENCES invocation (invocationid) MATCH SIMPLE
@@ -120,4 +118,19 @@ CREATE TABLE IF NOT EXISTS invocationtag
   CONSTRAINT invocationtag_tag_fk FOREIGN KEY (tagid)
       REFERENCES tag (tagid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-);`
+);
+
+-- name: create-commandhistory-view
+CREATE OR REPLACE VIEW commandhistory AS
+SELECT U.username AS user,I.invocationid,I.sessionid,I.returnstatus,I.timestamp,
+CT.hostname,CT.username,CT.shell,CT.directory,CM.commandstring,
+ARRAY(SELECT TA.name
+FROM(invocationtag TI LEFT OUTER JOIN tag T
+ON (TI.tagid = T.tagid)) TA
+WHERE TA.invocationid = I.invocationid) AS tags
+FROM invocation I INNER JOIN "session" S ON (I.sessionid = S.sessionid)
+INNER JOIN context CT ON (S.contextid = CT.contextid)
+INNER JOIN command CM ON (I.commandid = CM.commandid)
+INNER JOIN "user" U ON (I.userid = U.userid)
+ORDER BY I.invocationid DESC;
+

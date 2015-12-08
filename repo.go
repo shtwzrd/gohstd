@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
+	"github.com/nleof/goyesql"
 	"log"
 	"os"
 	"strings"
@@ -32,43 +33,16 @@ func init() {
 	ensureDb(AppDB)
 
 	// Create all the Tables, Views if they do not exist
-	tables := []string{
-		SqlCreateUserTable,
-		SqlCreateCommandTable,
-		SqlCreateConfigurationTable,
-		SqlCreateContextTable,
-		SqlCreateSessionTable,
-		SqlCreateInvocationTable,
-		SqlCreateTagTable,
-		SqlCreateInvocationTagTable,
-		SqlCreateNotificationTable,
-		SqlCreateServiceLogTable,
-		SqlCreateCommandHistoryView}
-	fmt.Println(tables)
+	defs := goyesql.MustParseFile("data/sql/ddl.sql")
 
-	procs := []string{
-		SqlInsertNotificationFunction,
-		SqlCommandNotificationTrigger}
-
-	fmt.Println(procs)
-
-	for _, t := range tables {
-		_, err := dao[AppDB].Exec(t)
+	for _, d := range defs {
+		_, err := dao[AppDB].Exec(fmt.Sprint(d))
 		if err != nil {
-			fmt.Println(t)
 			log.Fatal(err)
 		}
 	}
 
-	for _, t := range procs {
-		_, err := dao[AppDB].Exec(t)
-		if err != nil {
-			fmt.Println(t)
-			log.Fatal(err)
-		}
-	}
-
-	fmt.Println("init completed")
+	log.Println("storage init completed")
 }
 
 // ensureDb verifies that we have created a sql.DB object for the given user
