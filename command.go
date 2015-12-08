@@ -17,7 +17,7 @@ type Invocation struct {
 	User      string    `json:"user"`
 	Host      string    `json:"host"`
 	Shell     string    `json:"shell"`
-	Status    int8      `json:",status"`
+	ExitCode  int8      `json:",exitcode"`
 	Timestamp time.Time `json:"timestamp"`
 	Tags      []string  `json:"tags"`
 }

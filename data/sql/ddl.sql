@@ -1,11 +1,10 @@
 -- name: create-user-table
 CREATE TABLE IF NOT EXISTS "user"
 (
-  userid serial NOT NULL,
-  username character varying(128) UNIQUE,
+  username character varying(128),
   email character varying(320),
   password text,
-  CONSTRAINT user_pk PRIMARY KEY (userid)
+  CONSTRAINT user_pk PRIMARY KEY (username)
 );
 
 -- name: create-tag-table
@@ -24,84 +23,24 @@ CREATE TABLE IF NOT EXISTS command
   CONSTRAINT command_pk PRIMARY KEY (commandid)
 );
 
--- name: create-context-table
-CREATE TABLE IF NOT EXISTS context
-(
-  contextid serial NOT NULL,
-  hostname text,
-  username text,
-  shell text,
-  directory text,
-  CONSTRAINT context_pk PRIMARY KEY (contextid)
-);
-
--- name: create-configuration-table
-CREATE TABLE IF NOT EXISTS configuration
-(
-  configurationid serial NOT NULL,
-  userid integer,
-  key text,
-  value text,
-  CONSTRAINT configuration_pk PRIMARY KEY (configurationid),
-  CONSTRAINT configuration_user_fk FOREIGN KEY (userid)
-      REFERENCES "user" (userid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-);
-
--- name: create-session-table
-CREATE TABLE IF NOT EXISTS "session"
-(
-  sessionid serial NOT NULL,
-  contextid integer,
-  "timestamp" timestamp without time zone,
-  CONSTRAINT session_pk PRIMARY KEY (sessionid),
-  CONSTRAINT session_context_fk FOREIGN KEY (contextid)
-      REFERENCES context (contextid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-);
-
--- name: create-servicelog-table
-create table IF NOT EXISTS servicelog
-(
-  requestid serial NOT NULL,
-  userid integer,
-  message text,
-  CONSTRAINT servicelog_pk PRIMARY KEY (requestid),
-  CONSTRAINT servicelog_user_fk FOREIGN KEY (userid)
-      REFERENCES "user" (userid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-);
-
--- name: create-notification-table
-CREATE TABLE IF NOT EXISTS notification
-(
-  notificationid serial NOT NULL,
-  userid integer,
-  message text,
-  CONSTRAINT notification_pk PRIMARY KEY (notificationid),
-  CONSTRAINT notification_user_fk FOREIGN KEY (userid)
-      REFERENCES "user" (userid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-);
-
 -- name: create-invocation-table
 CREATE TABLE IF NOT EXISTS invocation
 (
   invocationid serial NOT NULL,
-  userid integer,
+  username character varying(128),
   commandid integer,
-  returnstatus smallint,
+  exitcode smallint,
+  hostname text,
+  "user" text,
+  shell text,
+  directory text,
   "timestamp" timestamp without time zone,
-  sessionid integer,
   CONSTRAINT invocation_pk PRIMARY KEY (invocationid),
   CONSTRAINT invocation_command_fk FOREIGN KEY (commandid)
       REFERENCES command (commandid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT invocation_session_fk FOREIGN KEY (sessionid)
-      REFERENCES session (sessionid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT invocation_user_fk FOREIGN KEY (userid)
-      REFERENCES "user" (userid) MATCH SIMPLE
+  CONSTRAINT invocation_user_fk FOREIGN KEY (username)
+      REFERENCES "user" (username) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
@@ -122,15 +61,11 @@ CREATE TABLE IF NOT EXISTS invocationtag
 
 -- name: create-commandhistory-view
 CREATE OR REPLACE VIEW commandhistory AS
-SELECT U.username AS user,I.invocationid,I.sessionid,I.returnstatus,I.timestamp,
-CT.hostname,CT.username,CT.shell,CT.directory,CM.commandstring,
-ARRAY(SELECT TA.name
-FROM(invocationtag TI LEFT OUTER JOIN tag T
-ON (TI.tagid = T.tagid)) TA
-WHERE TA.invocationid = I.invocationid) AS tags
-FROM invocation I INNER JOIN "session" S ON (I.sessionid = S.sessionid)
-INNER JOIN context CT ON (S.contextid = CT.contextid)
-INNER JOIN command CM ON (I.commandid = CM.commandid)
-INNER JOIN "user" U ON (I.userid = U.userid)
-ORDER BY I.invocationid DESC;
-
+  SELECT I.username,I.invocationid,I.timestamp,I.exitcode,
+    I.hostname,I.user,I.shell,I.directory,CM.commandstring,
+    ARRAY(SELECT TA.name
+      FROM(invocationtag TI LEFT OUTER JOIN tag T
+        ON (TI.tagid = T.tagid)) TA
+  WHERE TA.invocationid = I.invocationid) AS tags
+  FROM invocation I INNER JOIN command CM ON (I.commandid = CM.commandid)
+  ORDER BY I.invocationid DESC;

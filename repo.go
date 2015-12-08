@@ -17,6 +17,7 @@ import (
 // dao is a collection of *sql.DB identified by strings (usernames), the point
 // being that each user gets their own connection pool
 var dao map[string]*sql.DB
+var ddl goyesql.Queries
 var conn string
 
 // AppDB is an identifier for a specific *sql.DB in our dao map
@@ -33,33 +34,29 @@ func init() {
 	ensureDb(AppDB)
 
 	// Create all the Tables, Views if they do not exist
-	defs := goyesql.MustParseFile("data/sql/ddl.sql")
+	ddl = goyesql.MustParseFile("data/sql/ddl.sql")
 
-	var err error
-	_, err = fmt.Println("create-user-table")
-	if err != nil {
-		fmt.Println(err)
-	}
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-user-table"]))
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-command-table"]))
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-context-table"]))
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-session-table"]))
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-tag-table"]))
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-configuration-table"]))
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-servicelog-table"]))
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-invocation-table"]))
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-invocationtag-table"]))
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-notification-table"]))
-	_, err = dao[AppDB].Exec(fmt.Sprint(defs["create-commandhistory-view"]))
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	logExec(dao[AppDB], fmt.Sprint(ddl["create-user-table"]))
+	logExec(dao[AppDB], fmt.Sprint(ddl["create-command-table"]))
+	logExec(dao[AppDB], fmt.Sprint(ddl["create-tag-table"]))
+	logExec(dao[AppDB], fmt.Sprint(ddl["create-invocation-table"]))
+	logExec(dao[AppDB], fmt.Sprint(ddl["create-invocationtag-table"]))
+	logExec(dao[AppDB], fmt.Sprint(ddl["create-commandhistory-view"]))
 
 	log.Println("storage init completed")
 }
 
-// ensureDb verifies that we have created a sql.DB object for the given user
+func logExec(conn *sql.DB, query string) {
+	log.Printf("executing query: '%s'\n", query)
+	_, err := conn.Exec(query)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		log.Printf("executed query: '%s'\n", query)
+	}
+}
+
+// ensureDb verifies that we have created a connection pool for the given user
 func ensureDb(user string) {
 	_, exists := dao[user]
 
@@ -110,7 +107,7 @@ func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err err
 		inc = -1
 	}
 	for rows.Next() && inc < pageSize {
-		err = rows.Scan(&tmp.Id, &tmp.SessionId, &tmp.Status, &tmp.Timestamp,
+		err = rows.Scan(&tmp.Id, &tmp.SessionId, &tmp.ExitCode, &tmp.Timestamp,
 			&tmp.Host, &tmp.User, &tmp.Shell, &tmp.Directory, &tmp.Command, &tags)
 		if err != nil {
 			log.Println(err)
@@ -150,10 +147,6 @@ func InsertInvocations(user string, invocs Invocations) (err error) {
 // invocationTx handles the insertion of a single Invocation, as part of a batch
 // transaction
 func invocationTx(tx *sql.Tx, user string, inv Invocation) (err error) {
-	var uid int
-	err = tx.QueryRow(`
-        SELECT userid FROM "user" WHERE username=$1`, user).Scan(&uid)
-
 	var cmdid int
 	err = tx.QueryRow(`
         SELECT commandid FROM command WHERE commandstring=$1`, inv.Command).
@@ -168,43 +161,14 @@ func invocationTx(tx *sql.Tx, user string, inv Invocation) (err error) {
 		}
 	}
 
-	var ctxid int
-	err = tx.QueryRow(`
-        SELECT contextid FROM context
-        WHERE hostname = $1 AND username = $2 AND shell = $3 AND directory = $4`,
-		inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&ctxid)
-
-	if err == sql.ErrNoRows {
-		err2 := tx.QueryRow(`
-            INSERT INTO context (hostname, username, shell, directory)
-            VALUES ($1, $2, $3, $4) RETURNING contextid`,
-			inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&ctxid)
-		if err2 != nil {
-			return err2
-		}
-	}
-
-	var sessionid int
-	err = tx.QueryRow(`
-        SELECT sessionid FROM "session" WHERE contextid=$1`, ctxid).
-		Scan(&sessionid)
-
-	if err == sql.ErrNoRows {
-		err2 := tx.QueryRow(`
-            INSERT INTO "session" (contextid,"timestamp")
-            VALUES($1, $2) RETURNING sessionid`,
-			ctxid, inv.Timestamp).Scan(&sessionid)
-		if err2 != nil {
-			return err2
-		}
-	}
-
 	var invid int
 	err = tx.QueryRow(`
            INSERT INTO invocation
-           (userid, commandid, returnstatus, "timestamp", sessionid)
-           VALUES ($1, $2, $3, $4, $5) RETURNING invocationid`,
-		uid, cmdid, inv.Status, inv.Timestamp, sessionid).Scan(&invid)
+           (username, commandid, exitcode, "timestamp", hostname, user
+           shell, directory)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING invocationid`,
+		user, cmdid, inv.ExitCode, inv.Timestamp,
+		inv.Host, inv.User, inv.Shell, inv.Directory).Scan(&invid)
 
 	for _, tag := range inv.Tags {
 		err = AddTag(tx, user, invid, tag)
@@ -237,8 +201,8 @@ func AddTag(tx *sql.Tx, user string, invid int, tag string) (err error) {
 // user
 func GetInvocations(user string, pageSize int) (result Invocations, err error) {
 	query := `SELECT invocationid, sessionid, returnstatus, "timestamp", hostname,
-            username, shell, directory, commandstring, tags
-            FROM commandhistory WHERE "user" = $1 LIMIT $2`
+            user, shell, directory, commandstring, tags
+            FROM commandhistory WHERE username = $1 LIMIT $2`
 
 	ensureDb(user)
 	rows, err := dao[user].Query(query, user, pageSize)
