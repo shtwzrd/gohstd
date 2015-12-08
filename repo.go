@@ -107,7 +107,7 @@ func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err err
 		inc = -1
 	}
 	for rows.Next() && inc < pageSize {
-		err = rows.Scan(&tmp.Id, &tmp.SessionId, &tmp.ExitCode, &tmp.Timestamp,
+		err = rows.Scan(&tmp.Id, &tmp.ExitCode, &tmp.Timestamp,
 			&tmp.Host, &tmp.User, &tmp.Shell, &tmp.Directory, &tmp.Command, &tags)
 		if err != nil {
 			log.Println(err)
@@ -200,8 +200,8 @@ func AddTag(tx *sql.Tx, user string, invid int, tag string) (err error) {
 // GetInvocations returns the [pageSize] most recent Invocations for the given
 // user
 func GetInvocations(user string, pageSize int) (result Invocations, err error) {
-	query := `SELECT invocationid, sessionid, returnstatus, "timestamp", hostname,
-            user, shell, directory, commandstring, tags
+	query := `SELECT invocationid, exitcode, "timestamp", hostname,
+            "user", shell, directory, commandstring, tags
             FROM commandhistory WHERE username = $1 LIMIT $2`
 
 	ensureDb(user)
@@ -217,7 +217,7 @@ func GetInvocations(user string, pageSize int) (result Invocations, err error) {
 // GetCommands returns the [pageSize] most recent Commands for the given user
 func GetCommands(user string, pageSize int) (result Commands, err error) {
 	query := `SELECT commandstring FROM commandhistory
-            WHERE "user" = $1 LIMIT $2`
+            WHERE username = $1 LIMIT $2`
 
 	ensureDb(user)
 	rows, err := dao[user].Query(query, user, pageSize)
