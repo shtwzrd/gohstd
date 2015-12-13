@@ -42,6 +42,7 @@ func init() {
 	logExec(dao[AppDB], (string)(ddl["create-invocation-table"]))
 	logExec(dao[AppDB], (string)(ddl["create-invocationtag-table"]))
 	logExec(dao[AppDB], (string)(ddl["create-commandhistory-view"]))
+	logExec(dao[AppDB], (string)(ddl["create-timestamp-index"]))
 
 	// Load all data-manipulation queries
 	dml = goyesql.MustParseFile("data/sql/queries.sql")

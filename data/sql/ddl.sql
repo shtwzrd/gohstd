@@ -68,4 +68,14 @@ CREATE OR REPLACE VIEW commandhistory AS
         ON (TI.tagid = T.tagid)) TA
   WHERE TA.invocationid = I.invocationid) AS tags
   FROM invocation I INNER JOIN command CM ON (I.commandid = CM.commandid)
-  ORDER BY I.invocationid DESC;
+  ORDER BY I.timestamp DESC;
+
+-- name: create-timestamp-index
+DO $$
+BEGIN
+IF NOT EXISTS (
+  SELECT to_regclass('public.timestampindex')
+  ) THEN
+  CREATE INDEX timestampindex ON public.invocation ("timestamp");
+END IF;
+END$$;
