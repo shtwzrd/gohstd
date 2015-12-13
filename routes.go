@@ -17,10 +17,13 @@ type Route struct {
 
 type Routes []Route
 
+var repo Repo
+
 // NewRouter constructs a *mux.Router based on the routes defined in this
 // package, which can then be passed to the net/http server.
-func NewRouter() *mux.Router {
+func NewRouter(r Repo) *mux.Router {
 
+	repo = r
 	router := mux.NewRouter().StrictSlash(true)
 	for _, route := range routes {
 		var handler http.Handler

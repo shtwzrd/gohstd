@@ -39,9 +39,9 @@ func CommandIndex(w http.ResponseWriter, r *http.Request) {
 
 	var commands interface{}
 	if verbose {
-		commands, err = GetInvocations(user, pageSize)
+		commands, err = repo.GetInvocations(user, pageSize)
 	} else {
-		commands, err = GetCommands(user, pageSize)
+		commands, err = repo.GetCommands(user, pageSize)
 	}
 	if err != nil {
 		log.Println(err)
@@ -90,7 +90,7 @@ func CommandCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = InsertInvocations(user, inv)
+	err = repo.InsertInvocations(user, inv)
 	if err != nil {
 		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
 		w.WriteHeader(http.StatusBadRequest)
