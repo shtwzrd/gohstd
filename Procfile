@@ -1,1 +1,1 @@
-web: webgohst
+web: gohstd
