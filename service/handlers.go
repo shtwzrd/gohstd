@@ -1,10 +1,10 @@
-package gohstd
+package service
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	gohst "github.com/warreq/gohstd/src/gohstd/common"
+	gohst "github.com/warreq/gohstd/common"
 	"io/ioutil"
 	"log"
 	"net/http"

@@ -1,3 +1,5 @@
+// Package common houses data structures and interfaces shared between gohstd
+// and potential clients
 package common
 
 import (

@@ -1,10 +1,10 @@
-package gohstd
+package service
 
 import (
 	"database/sql"
 	_ "github.com/lib/pq"
 	"github.com/nleof/goyesql"
-	gohst "github.com/warreq/gohstd/src/gohstd/common"
+	gohst "github.com/warreq/gohstd/common"
 	"log"
 	"os"
 	"strings"

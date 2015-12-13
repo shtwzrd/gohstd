@@ -1,4 +1,4 @@
-package gohstd
+package service
 
 import (
 	"log"

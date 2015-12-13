@@ -1,7 +1,7 @@
 package main
 
 import (
-	gohst "github.com/warreq/gohstd/src/gohstd"
+	gohst "github.com/warreq/gohstd/service"
 	"log"
 	"net/http"
 	"os"

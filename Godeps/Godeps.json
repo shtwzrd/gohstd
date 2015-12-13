@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/warreq/webgohst",
+	"ImportPath": "github.com/warreq/gohstd",
 	"GoVersion": "go1.5.2",
 	"Deps": [
 		{

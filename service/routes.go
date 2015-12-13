@@ -1,8 +1,10 @@
-package gohstd
+// Package service implements the gohstd web service, providing remote access
+// to the command history supplied by gohst clients
+package service
 
 import (
 	"github.com/gorilla/mux"
-	gohst "github.com/warreq/gohstd/src/gohstd/common"
+	gohst "github.com/warreq/gohstd/common"
 	"net/http"
 )
 
