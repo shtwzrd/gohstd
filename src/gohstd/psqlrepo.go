@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/lib/pq"
 	"github.com/nleof/goyesql"
+	gohst "github.com/warreq/gohstd/src/gohstd/common"
 	"log"
 	"os"
 	"strings"
@@ -83,7 +84,7 @@ func (r *PsqlRepo) ensureDb(user string) {
 }
 
 // queryCommands is a common handler for implementing paging over Commands
-func queryCommands(rows *sql.Rows, pageSize int) (result Commands, err error) {
+func queryCommands(rows *sql.Rows, pageSize int) (result gohst.Commands, err error) {
 	defer rows.Close()
 	var c string
 	inc := 0
@@ -95,7 +96,7 @@ func queryCommands(rows *sql.Rows, pageSize int) (result Commands, err error) {
 		if err != nil {
 			return
 		}
-		result = append(result, Command(c))
+		result = append(result, gohst.Command(c))
 		if pageSize > 0 {
 			inc++
 		}
@@ -108,9 +109,9 @@ func queryCommands(rows *sql.Rows, pageSize int) (result Commands, err error) {
 }
 
 // queryInvocations is a common handler for implementing paging over Invocations
-func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err error) {
+func queryInvocations(rows *sql.Rows, pageSize int) (result gohst.Invocations, err error) {
 	defer rows.Close()
-	var tmp Invocation
+	var tmp gohst.Invocation
 	var tags string
 	inc := 0
 	if pageSize == 0 {
@@ -137,7 +138,7 @@ func queryInvocations(rows *sql.Rows, pageSize int) (result Invocations, err err
 }
 
 // InsertInvocations sets up a transaction for commiting a batch of Invocations
-func (r *PsqlRepo) InsertInvocations(user string, invocs Invocations) (err error) {
+func (r *PsqlRepo) InsertInvocations(user string, invocs gohst.Invocations) (err error) {
 	r.ensureDb(user)
 	tx, err := r.dao[user].Begin()
 	if err != nil {
@@ -156,7 +157,7 @@ func (r *PsqlRepo) InsertInvocations(user string, invocs Invocations) (err error
 
 // invocationTx handles the insertion of a single Invocation, as part of a batch
 // transaction
-func (r *PsqlRepo) invocationTx(tx *sql.Tx, user string, inv Invocation) (err error) {
+func (r *PsqlRepo) invocationTx(tx *sql.Tx, user string, inv gohst.Invocation) (err error) {
 	var cmdid int
 	err = tx.QueryRow(r.ql("get-commandid-by-command"), inv.Command).Scan(&cmdid)
 
@@ -195,7 +196,7 @@ func (r *PsqlRepo) AddTag(tx *sql.Tx, user string, invid int, tag string) (err e
 
 // GetInvocations returns the [pageSize] most recent Invocations for the given
 // user
-func (r *PsqlRepo) GetInvocations(user string, pageSize int) (result Invocations, err error) {
+func (r *PsqlRepo) GetInvocations(user string, pageSize int) (result gohst.Invocations, err error) {
 	r.ensureDb(user)
 	rows, err := r.dao[user].Query(r.ql("get-invocations-by-user"), user, pageSize)
 	if err != nil {
@@ -207,7 +208,7 @@ func (r *PsqlRepo) GetInvocations(user string, pageSize int) (result Invocations
 }
 
 // GetCommands returns the [pageSize] most recent Commands for the given user
-func (r *PsqlRepo) GetCommands(user string, pageSize int) (result Commands, err error) {
+func (r *PsqlRepo) GetCommands(user string, pageSize int) (result gohst.Commands, err error) {
 	r.ensureDb(user)
 	rows, err := r.dao[user].Query(r.ql("get-commands-by-user"), user, pageSize)
 	if err != nil {

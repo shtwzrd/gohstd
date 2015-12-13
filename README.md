@@ -15,7 +15,7 @@ _or_
 
     git clone https://github.com/warreq/gohstd
     cd gohstd 
-    go build -o gohstd
+    go build -o gohst ./src/
 
 ## Installation
 

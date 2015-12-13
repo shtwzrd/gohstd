@@ -1,10 +1,10 @@
 package gohstd
 
 import (
-	"../gohstd/common"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	gohst "github.com/warreq/gohstd/src/gohstd/common"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -68,7 +68,7 @@ func CommandCreate(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	user := vars["username"]
 
-	var inv Invocations
+	var inv gohst.Invocations
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")

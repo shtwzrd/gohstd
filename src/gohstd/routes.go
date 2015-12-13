@@ -2,6 +2,7 @@ package gohstd
 
 import (
 	"github.com/gorilla/mux"
+	gohst "github.com/warreq/gohstd/src/gohstd/common"
 	"net/http"
 )
 
@@ -17,11 +18,11 @@ type Route struct {
 
 type Routes []Route
 
-var repo Repo
+var repo gohst.Repo
 
 // NewRouter constructs a *mux.Router based on the routes defined in this
 // package, which can then be passed to the net/http server.
-func NewRouter(r Repo) *mux.Router {
+func NewRouter(r gohst.Repo) *mux.Router {
 
 	repo = r
 	router := mux.NewRouter().StrictSlash(true)
