@@ -116,3 +116,5 @@ Session.vim
 
 Godeps/Readme
 Godeps/_workspace
+node_modules/
+*.map
