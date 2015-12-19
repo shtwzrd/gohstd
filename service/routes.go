@@ -25,9 +25,9 @@ var repo gohst.Repo
 // NewRouter constructs a *mux.Router based on the routes defined in this
 // package, which can then be passed to the net/http server.
 func NewRouter(r gohst.Repo) *mux.Router {
-
 	repo = r
 	router := mux.NewRouter().StrictSlash(true)
+
 	for _, route := range routes {
 		var handler http.Handler
 
@@ -42,6 +42,7 @@ func NewRouter(r gohst.Repo) *mux.Router {
 			Handler(route.HandlerFunc)
 	}
 
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	return router
 }
 
