@@ -4,18 +4,20 @@ go:
 - tip
 language: node_js
 node_js:
-- 4.2
-compiler: clang-3.6
+  - 4.2
+  - 5.2
 env:
-  - CXX=clang-3.6
+  - CXX=g++-4.8
 addons:
   apt:
-    sources:
-      - llvm-toolchain-precise-3.6
-      - ubuntu-toolchain-r-test
     packages:
-      - clang-3.6
       - g++-4.8
+    sources:
+      - ubuntu-toolchain-r-test
+install:
+  - npm install
+script:
+  - .static/node_modules/.bin/gulp test
 notifications:
   slack:
     secure: oFNwEIOWoge0kjSWxGaODSoVLKFCzoK7K98mbUVOtmd0TFoPPKvMGWwVW82FG4hwXMBe28brZJvIw+Haj21cNje45jveeipp3Ere8OAJ3/md7GQ1pV8r/nXIh6hDsfILZ5UqxXAbeBw4ab+F6+hP8lm0zTbudK4gSQITUUtTZNGvLqqshS1IPxMdScfWDoZqOePzTOLjVoW5EpDqr2xFlNgUbPYERZR+fplaR2agJ2/Bvxj/3bn/d70eB8PEPUvaJ1dKOCqgFcPMyR30Ot+fgkRNk3JOeAU4+LRr7iXKO2xZio/HzoM448/LuPqGhosg8oA/bRyJCLuj4bOLuaiFSYCMfzpJuK5ZIwRs7GCWLqUVjaccn35YdrUCL40q3OF/2VL84aADGhKTNJapEmFnvDcRMxCJBo5aac8/WaZZMfNeJtwuhXWKzful0AZ2tCfXUye/kr6IIEjrGzG24+aE/d4ZvxMsF7Zfec8zEXRsqkHP8gmnqo9h4ucLAeKcjeDEP0jfSCMJVECkPeYkfOEsPuHWqAMsWqcrs3G9n1Oarvq8emY3CWAKoEFActp3ZlEkenv7m3v5HGP0moz75iDZzNowafJmgYj3WVu6QJPoq1ZM2lwSOLAp0OLLK4VNVEVZU66Jv8N+tx6odzGLKy2XZfBAkG5e26TGHWToC8XwNqg=
