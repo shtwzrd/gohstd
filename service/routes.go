@@ -42,7 +42,7 @@ func NewRouter(r gohst.Repo) *mux.Router {
 			Handler(route.HandlerFunc)
 	}
 
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./webapp/app")))
 	return router
 }
 

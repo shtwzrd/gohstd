@@ -2,7 +2,7 @@ language: go
 go:
 - 1.5
 before_install:
-  - cd ./static
+  - cd ./webapp
 install:
   - . $HOME/.nvm/nvm.sh
   - nvm install stable
