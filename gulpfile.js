@@ -12,7 +12,6 @@ const sourcemaps   = require('gulp-sourcemaps');
 const tslint       = require('gulp-tslint');
 const typescript   = require('gulp-typescript');
 
-
 //=========================================================
 //  PATHS
 //---------------------------------------------------------
@@ -29,23 +28,22 @@ const paths = {
       'node_modules/systemjs/dist/system.src.{js,min.js,min.js.map}',
       'node_modules/systemjs/dist/system.{js,js.map}'
     ],
-    target: 'app/lib'
+    target: 'webapp/app/lib'
   },
 
   src: {
-    html: '**/*.html',
-    sass: 'src/**/*.scss',
-    ts: 'src/**/*.ts'
+    html: 'webapp/**/*.html',
+    sass: 'webapp/src/**/*.scss',
+    ts: 'webapp/src/**/*.ts'
   },
 
-  target: 'app',
+  target: 'webapp/app',
 
   typings: {
     entries: 'typings/tsd.d.ts',
     watch: 'typings/**/*.ts'
   }
 };
-
 
 //=========================================================
 //  CONFIG
@@ -88,24 +86,20 @@ const config = {
   }
 };
 
-
 //=========================================================
 //  TASKS
 //---------------------------------------------------------
 gulp.task('clean.target', () => del(paths.target));
-
 
 gulp.task('copy.html', () => {
   return gulp.src(paths.src.html)
     .pipe(gulp.dest(paths.target));
 });
 
-
 gulp.task('copy.lib', () => {
   return gulp.src(paths.lib.src)
     .pipe(gulp.dest(paths.lib.target));
 });
-
 
 gulp.task('lint', () => {
   return gulp.src(paths.src.ts)
@@ -116,7 +110,6 @@ gulp.task('lint', () => {
     ));
 });
 
-
 gulp.task('sass', () => {
   return gulp.src(paths.src.sass)
     .pipe(sass(config.sass))
@@ -126,12 +119,10 @@ gulp.task('sass', () => {
     .pipe(gulp.dest(paths.target));
 });
 
-
 gulp.task('serve', done => {
   browserSync.create()
     .init(config.browserSync, done);
 });
-
 
 const tsProject = typescript.createProject(config.ts.configFile);
 
@@ -145,7 +136,6 @@ gulp.task('ts', () => {
     .pipe(gulp.dest(paths.target));
 });
 
-
 //===========================
 //  BUILD
 //---------------------------
@@ -156,7 +146,6 @@ gulp.task('build', gulp.series(
   'sass',
   'ts'
 ));
-
 
 //===========================
 //  DEVELOP
@@ -171,13 +160,12 @@ gulp.task('default', gulp.series(
   }
 ));
 
-
 //===========================
 //  TEST
 //---------------------------
 
 gulp.task('jasmine', function () {
-    return gulp.src('tests/test.js')
+    return gulp.src('webapp/tests/test.js')
         .pipe(jasmine());
 });
 

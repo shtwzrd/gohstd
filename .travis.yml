@@ -1,8 +1,6 @@
 language: go
 go:
 - 1.5
-before_install:
-  - cd ./webapp
 install:
   - . $HOME/.nvm/nvm.sh
   - nvm install stable
@@ -10,7 +8,6 @@ install:
   - npm install
 script:
   - ./node_modules/.bin/gulp test
-  - cd ..
   - export GOPATH=${TRAVIS_BUILD_DIR}/Godeps/_workspace:$GOPATH
   - export PATH=${TRAVIS_BUILD_DIR}/Godeps/_workspace/bin:$PATH
   - go get -t github.com/tools/godep
