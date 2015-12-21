@@ -120,4 +120,3 @@ node_modules/
 *.map
 # Don't include the transpiled js
 *.js
-app/
