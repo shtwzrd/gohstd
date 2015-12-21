@@ -2,6 +2,7 @@ language: go
 go:
 - 1.5
 - tip
+
 language: node_js
 node_js:
   - 4.2
@@ -14,8 +15,8 @@ addons:
       - g++-4.8
     sources:
       - ubuntu-toolchain-r-test
-beforeinstall:
-  - cd static
+before_install:
+  - cd ./static
 install:
   - npm install
 script:
