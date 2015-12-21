@@ -118,3 +118,5 @@ Godeps/Readme
 Godeps/_workspace
 node_modules/
 *.map
+# Don't include the transpiled js
+*.js
