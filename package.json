@@ -25,7 +25,7 @@
     "zone.js": "0.5.10"
   },
   "devDependencies": {
-    "autoprefixer": "~6.1.2",
+    "autoprefixer": "~6.2.1",
     "browser-sync": "~2.10.1",
     "connect-history-api-fallback": "~1.1.0",
     "del": "~2.2.0",
