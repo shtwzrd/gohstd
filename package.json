@@ -7,8 +7,8 @@
     "lite": "lite-server",
     "start": "concurrent \"npm run tsc:w\" \"npm run lite\" "
   },
-  { "engines" :
-      { "node" : ">=4.2.3" }
+  "engines" : {
+    "node" : ">=4.2.3"
   },
   "license": "AGPL-1.0",
   "repository" : {
