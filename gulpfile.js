@@ -25,6 +25,7 @@ const paths = {
       'node_modules/rxjs/bundles/Rx.{js,min.js,min.js.map}',
       'node_modules/es6-shim/es6-shim.{js,min.js,min.js.map}',
       'node_modules/angular2/bundles/angular2.dev.{js,min.js,min.js.map}',
+      'node_modules/openpgp/dist/openpgp.{js,min.js,min.js.map}',
       'node_modules/systemjs/dist/system.src.{js,min.js,min.js.map}',
       'node_modules/systemjs/dist/system.{js,js.map}'
     ],
