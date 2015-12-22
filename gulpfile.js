@@ -147,6 +147,10 @@ gulp.task('build', gulp.series(
   'ts'
 ));
 
+gulp.task('heroku', gulp.series(
+    'build'
+));
+
 //===========================
 //  DEVELOP
 //---------------------------
