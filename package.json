@@ -7,7 +7,14 @@
     "lite": "lite-server",
     "start": "concurrent \"npm run tsc:w\" \"npm run lite\" "
   },
+  { "engines" :
+      { "node" : ">=4.2.3" }
+  },
   "license": "AGPL-1.0",
+  "repository" : {
+     "type" : "git",
+     "url" : "https://github.com/warreq/gohstd.git"
+  },
   "dependencies": {
     "angular2": "2.0.0-beta.0",
     "systemjs": "0.19.6",
