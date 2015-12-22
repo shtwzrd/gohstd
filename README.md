@@ -8,14 +8,13 @@ A web service for hosting your command history remotely, to be queried by all yo
 2. Set the GOPATH environment variable
 3. Fetch gohstd
 Install it via `go get` like so:
-
     `go get github.com/warreq/gohstd`
-
 _or_
-
-    git clone https://github.com/warreq/gohstd
-    cd gohstd 
-    go build
+   `git clone https://github.com/warreq/gohstd`
+   `cd gohstd` 
+   `go build`
+4. (_Optional_) Build the web application
+   `./node_modules/.bin/gulp test`
 
 ## Installation
 
