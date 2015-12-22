@@ -147,7 +147,7 @@ gulp.task('build', gulp.series(
   'ts'
 ));
 
-gulp.task('heroku', gulp.series(
+gulp.task('heroku:production', gulp.series(
     'build'
 ));
 
