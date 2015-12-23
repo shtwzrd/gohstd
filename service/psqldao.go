@@ -68,8 +68,8 @@ func logExec(conn *sql.DB, query string) {
 }
 
 // EnsurePool verifies that we have created a connection pool for the given user
-func (r *PsqlDao) EnsurePool(user string) (db *sql.DB) {
-	db, exists := r.dao[user]
+func (r *PsqlDao) EnsurePool(user string) *sql.DB {
+	_, exists := r.dao[user]
 
 	if !exists {
 		var err error
@@ -81,5 +81,5 @@ func (r *PsqlDao) EnsurePool(user string) (db *sql.DB) {
 			log.Fatal(err)
 		}
 	}
-	return
+	return r.dao[user]
 }
