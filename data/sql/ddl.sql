@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS "user"
 (
   username character varying(128),
   email character varying(320),
-  password text,
+  publickey bytea,
   CONSTRAINT user_pk PRIMARY KEY (username)
 );
 

@@ -1,8 +1,9 @@
 package common
 
-// Repo [sitory] is an interface wrapping the functions for working with command
-// and invocation data
-type Repo interface {
+// CommandRepo [sitory] is an interface wrapping the functions for working with
+// command and invocation data
+type CommandRepo interface {
+	// InsertInvocations writes Invocations to storage
 	InsertInvocations(user string, invocs Invocations) (err error)
 
 	// GetInvocations returns the [n] most recent Invocations for the given

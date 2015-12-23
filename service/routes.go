@@ -20,12 +20,14 @@ type Route struct {
 
 type Routes []Route
 
-var repo gohst.Repo
+var userRepo gohst.UserRepo
+var commandRepo gohst.CommandRepo
 
 // NewRouter constructs a *mux.Router based on the routes defined in this
 // package, which can then be passed to the net/http server.
-func NewRouter(r gohst.Repo) *mux.Router {
-	repo = r
+func NewRouter(cmd gohst.CommandRepo, user gohst.UserRepo) *mux.Router {
+	userRepo = user
+	commandRepo = cmd
 	router := mux.NewRouter().StrictSlash(true)
 
 	for _, route := range routes {
@@ -42,6 +44,7 @@ func NewRouter(r gohst.Repo) *mux.Router {
 			Handler(route.HandlerFunc)
 	}
 
+	// Serve the web application on the root path
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./webapp/app")))
 	return router
 }
@@ -52,6 +55,12 @@ var routes = Routes{
 		"POST",
 		"/api/users/register",
 		UserRegister,
+	},
+	Route{
+		"UserLogin",
+		"POST",
+		"/api/users/login",
+		UserLogin,
 	},
 	Route{
 		"UserShow",

@@ -32,31 +32,32 @@ func CommandIndex(w http.ResponseWriter, r *http.Request) {
 	} else {
 		pageSize, err = strconv.Atoi(count)
 		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusBadRequest)
+			HttpError(w, http.StatusBadRequest, nil)
 			return
 		}
 	}
 
 	var commands interface{}
 	if verbose {
-		commands, err = repo.GetInvocations(user, pageSize)
+		commands, err = commandRepo.GetInvocations(user, pageSize)
 	} else {
-		commands, err = repo.GetCommands(user, pageSize)
+		commands, err = commandRepo.GetCommands(user, pageSize)
 	}
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
+		HttpError(w, http.StatusBadRequest, nil)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(commands); err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		HttpError(w, http.StatusInternalServerError, nil)
 	}
 }
 
 func UserRegister(w http.ResponseWriter, r *http.Request) {
+	panic("Not yet implemented")
+}
+
+func UserLogin(w http.ResponseWriter, r *http.Request) {
 	panic("Not yet implemented")
 }
 
@@ -71,35 +72,22 @@ func CommandCreate(w http.ResponseWriter, r *http.Request) {
 	var inv gohst.Invocations
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, fmt.Sprint(err))
-		log.Println(err)
+		HttpError(w, http.StatusBadRequest, err)
 		return
 	}
 	if err := r.Body.Close(); err != nil {
-		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, fmt.Sprint(err))
+		HttpError(w, http.StatusBadRequest, err)
 		return
 	}
 	if err := json.Unmarshal(body, &inv); err != nil {
-		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
-		w.WriteHeader(422) // unprocessable entity
-		fmt.Fprintf(w, fmt.Sprint(err))
-		log.Println(err)
+		HttpError(w, 422, err) // unprocessable entity
 		return
 	}
-
-	err = repo.InsertInvocations(user, inv)
+	err = commandRepo.InsertInvocations(user, inv)
 	if err != nil {
-		w.Header().Set("Content-Type", "plaintext; charset=UTF-8")
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, fmt.Sprint(err))
-		log.Println(err)
+		HttpError(w, http.StatusBadRequest, err)
+		return
 	}
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -129,4 +117,13 @@ func CommandTagCreate(w http.ResponseWriter, r *http.Request) {
 
 func CommandTagDelete(w http.ResponseWriter, r *http.Request) {
 	panic("Not yet implemented")
+}
+
+// HttpError is a convenience function for writing the necessary headers and
+// content for returning an error
+func HttpError(w http.ResponseWriter, status int, err error) {
+	log.Println(err)
+	w.Header().Set("Content-Type", "plaintext;charset=UTF-8")
+	w.WriteHeader(status)
+	fmt.Fprintf(w, fmt.Sprint(err))
 }
