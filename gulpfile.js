@@ -1,5 +1,4 @@
 const autoprefixer = require('autoprefixer');
-const browserSync  = require('browser-sync');
 const changed      = require('gulp-changed');
 const del          = require('del');
 const exec         = require('child_process').exec;
@@ -12,9 +11,7 @@ const sourcemaps   = require('gulp-sourcemaps');
 const tslint       = require('gulp-tslint');
 const typescript   = require('gulp-typescript');
 
-//=========================================================
 //  PATHS
-//---------------------------------------------------------
 const paths = {
   lib: {
     src: [
@@ -46,26 +43,10 @@ const paths = {
   }
 };
 
-//=========================================================
 //  CONFIG
-//---------------------------------------------------------
 const config = {
   autoprefixer: {
     browsers: ['last 3 versions', 'Firefox ESR']
-  },
-
-  browserSync: {
-    files: [paths.target + '/**/*'],
-    notify: false,
-    open: false,
-    port: 3000,
-    reloadDelay: 500,
-    server: {
-      baseDir: paths.target,
-      middleware: [
-        historyApi()
-      ]
-    }
   },
 
   sass: {
@@ -80,16 +61,14 @@ const config = {
   },
 
   tslint: {
-    report: {
-      options: {emitError: true},
-      type: 'verbose'
-    }
-  }
+     report: {
+        options: {emitError: true},
+        type: 'verbose'
+     }
+   }
 };
 
-//=========================================================
 //  TASKS
-//---------------------------------------------------------
 gulp.task('clean.target', () => del(paths.target));
 
 gulp.task('copy.html', () => {
@@ -120,11 +99,6 @@ gulp.task('sass', () => {
     .pipe(gulp.dest(paths.target));
 });
 
-gulp.task('serve', done => {
-  browserSync.create()
-    .init(config.browserSync, done);
-});
-
 const tsProject = typescript.createProject(config.ts.configFile);
 
 gulp.task('ts', () => {
@@ -137,9 +111,7 @@ gulp.task('ts', () => {
     .pipe(gulp.dest(paths.target));
 });
 
-//===========================
 //  BUILD
-//---------------------------
 gulp.task('build', gulp.series(
   'clean.target',
   'copy.html',
@@ -148,23 +120,7 @@ gulp.task('build', gulp.series(
   'ts'
 ));
 
-//===========================
-//  DEVELOP
-//---------------------------
-gulp.task('default', gulp.series(
-  'build',
-  'serve',
-  function watch(){
-    gulp.watch(paths.src.html, gulp.task('copy.html'));
-    gulp.watch(paths.src.sass, gulp.task('sass'));
-    gulp.watch([paths.src.ts, paths.typings.watch], gulp.task('ts'));
-  }
-));
-
-//===========================
 //  TEST
-//---------------------------
-
 gulp.task('jasmine', function () {
     return gulp.src('webapp/tests/test.js')
         .pipe(jasmine());
