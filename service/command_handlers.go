@@ -2,11 +2,8 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	gohst "github.com/warreq/gohstd/common"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -53,58 +50,24 @@ func CommandIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UserRegister(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
-}
-
-func UserLogin(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
-}
-
-func UserShow(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
-}
-
 func CommandCreate(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	user := vars["username"]
 
 	var inv gohst.Invocations
-	body, err := ioutil.ReadAll(r.Body)
+	err := ParseJsonEntity(r, &inv)
+
 	if err != nil {
 		HttpError(w, http.StatusBadRequest, err)
 		return
 	}
-	if err := r.Body.Close(); err != nil {
-		HttpError(w, http.StatusBadRequest, err)
-		return
-	}
-	if err := json.Unmarshal(body, &inv); err != nil {
-		HttpError(w, 422, err) // unprocessable entity
-		return
-	}
+
 	err = commandRepo.InsertInvocations(user, inv)
 	if err != nil {
 		HttpError(w, http.StatusBadRequest, err)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-}
-
-func UserTagShow(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
-}
-
-func UserTagCreate(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
-}
-
-func UserTagRename(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
-}
-
-func UserTagDelete(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
 }
 
 func CommandDelete(w http.ResponseWriter, r *http.Request) {
@@ -117,13 +80,4 @@ func CommandTagCreate(w http.ResponseWriter, r *http.Request) {
 
 func CommandTagDelete(w http.ResponseWriter, r *http.Request) {
 	panic("Not yet implemented")
-}
-
-// HttpError is a convenience function for writing the necessary headers and
-// content for returning an error
-func HttpError(w http.ResponseWriter, status int, err error) {
-	log.Println(err)
-	w.Header().Set("Content-Type", "plaintext;charset=UTF-8")
-	w.WriteHeader(status)
-	fmt.Fprintf(w, fmt.Sprint(err))
 }
