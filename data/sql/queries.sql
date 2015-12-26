@@ -43,3 +43,13 @@ SELECT commandstring
 FROM commandhistory
 WHERE username = $1
 LIMIT $2
+
+-- name: insert-user
+INSERT INTO "user"
+(username, email, password)
+VALUES ($1, $2, $3)
+
+-- name: get-user-by-name
+SELECT email
+FROM "user"
+WHERE username = $1
