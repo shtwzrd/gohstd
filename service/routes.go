@@ -35,6 +35,7 @@ func NewRouter(cmd gohst.CommandRepo, user gohst.UserRepo) *mux.Router {
 
 		handler = route.HandlerFunc
 		handler = Logger(handler, route.Name)
+		handler = Auth(handler, route.Name)
 		handler = StandardHeader(handler)
 
 		router.

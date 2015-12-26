@@ -1,7 +1,5 @@
 package common
 
-const UserExistsError = `a user by that name already exists`
-
 // UserRepo [sitory] is an interface wrapping the functions for working with
 // user data
 type UserRepo interface {
