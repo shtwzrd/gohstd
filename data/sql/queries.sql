@@ -50,6 +50,6 @@ INSERT INTO "user"
 VALUES ($1, $2, $3)
 
 -- name: get-user-by-name
-SELECT email
+SELECT email, password
 FROM "user"
 WHERE username = $1

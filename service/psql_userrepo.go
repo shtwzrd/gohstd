@@ -31,11 +31,13 @@ func (r PsqlUserRepo) InsertUser(user g.User, secret g.Secret) (err error) {
 func (r PsqlUserRepo) GetUserByName(uname string) (user g.User, err error) {
 	db := r.dao.EnsurePool(uname)
 	var email string
-	err = db.QueryRow(r.dao.Query("get-user-by-name"), uname).Scan(&email)
+	var secret string
+	err = db.QueryRow(r.dao.Query("get-user-by-name"), uname).Scan(&email, &secret)
 
 	user = g.User{}
 	user.Username = uname
 	user.Email = email
+	user.Password = secret
 
 	return
 }

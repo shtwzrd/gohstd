@@ -33,16 +33,18 @@ func NewRouter(cmd gohst.CommandRepo, user gohst.UserRepo) *mux.Router {
 	for _, route := range routes {
 		var handler http.Handler
 
+		// Note that handler func wrapping like this means that the last one applied
+		// is the outer-most wrapper and executes first
 		handler = route.HandlerFunc
-		handler = Logger(handler, route.Name)
-		handler = Auth(handler, route.Name)
 		handler = StandardHeader(handler)
+		handler = Auth(handler, route.Name)
+		handler = Logger(handler, route.Name)
 
 		router.
 			Methods(route.Method).
 			Path(route.Pattern).
 			Name(route.Name).
-			Handler(route.HandlerFunc)
+			Handler(handler)
 	}
 
 	// Serve the web application on the root path
