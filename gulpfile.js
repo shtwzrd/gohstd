@@ -1,4 +1,5 @@
 const autoprefixer = require('autoprefixer');
+const browserSync  = require('browser-sync');
 const changed      = require('gulp-changed');
 const del          = require('del');
 const exec         = require('child_process').exec;
@@ -22,7 +23,6 @@ const paths = {
       'node_modules/rxjs/bundles/Rx.{js,min.js,min.js.map}',
       'node_modules/es6-shim/es6-shim.{js,min.js,min.js.map}',
       'node_modules/angular2/bundles/angular2.dev.{js,min.js,min.js.map}',
-      'node_modules/openpgp/dist/openpgp.{js,min.js,min.js.map}',
       'node_modules/systemjs/dist/system.src.{js,min.js,min.js.map}',
       'node_modules/systemjs/dist/system.{js,js.map}'
     ],
@@ -47,6 +47,20 @@ const paths = {
 const config = {
   autoprefixer: {
     browsers: ['last 3 versions', 'Firefox ESR']
+  },
+
+  browserSync: {
+      files: [paths.target + '/**/*'],
+      notify: false,
+      open: false,
+      port: 3000,
+      reloadDelay: 500,
+      server: {
+          baseDir: paths.target,
+          middleware: [
+              historyApi()
+          ]
+      }
   },
 
   sass: {
@@ -90,6 +104,11 @@ gulp.task('lint', () => {
     ));
 });
 
+gulp.task('serve', done => {
+    browserSync.create()
+        .init(config.browserSync, done);
+});
+
 gulp.task('sass', () => {
   return gulp.src(paths.src.sass)
     .pipe(sass(config.sass))
@@ -118,6 +137,17 @@ gulp.task('build', gulp.series(
   'copy.lib',
   'sass',
   'ts'
+));
+
+// DEV
+gulp.task('listen', gulp.series(
+    'build',
+    'serve',
+    function watch(){
+        gulp.watch(paths.src.html, gulp.task('copy.html'));
+        gulp.watch(paths.src.sass, gulp.task('sass'));
+        gulp.watch([paths.src.ts, paths.typings.watch], gulp.task('ts'));
+    }
 ));
 
 //  TEST
