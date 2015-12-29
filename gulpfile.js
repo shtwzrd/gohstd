@@ -31,7 +31,8 @@ const paths = {
   },
 
   src: {
-    html: 'webapp/**/*.html',
+    index: 'webapp/**/*.html',
+    html:  'webapp/src/**/*.html',
     sass: 'webapp/src/**/*.scss',
     ts: 'webapp/src/**/*.ts'
   },
@@ -91,6 +92,11 @@ gulp.task('copy.html', () => {
     .pipe(gulp.dest(paths.target));
 });
 
+gulp.task('copy.index', () => {
+    return gulp.src(paths.src.index)
+        .pipe(gulp.dest(paths.target));
+});
+
 gulp.task('copy.lib', () => {
   return gulp.src(paths.lib.src)
     .pipe(gulp.dest(paths.lib.target));
@@ -135,6 +141,7 @@ gulp.task('ts', () => {
 gulp.task('build', gulp.series(
   'clean.target',
   'copy.html',
+  'copy.index',
   'copy.lib',
   'sass',
   'ts'
@@ -146,6 +153,7 @@ gulp.task('listen', gulp.series(
     'serve',
     function watch(){
         gulp.watch(paths.src.html, gulp.task('copy.html'));
+        gulp.watch(paths.src.index, gulp.task('copy.index'));
         gulp.watch(paths.src.sass, gulp.task('sass'));
         gulp.watch([paths.src.ts, paths.typings.watch], gulp.task('ts'));
     }
