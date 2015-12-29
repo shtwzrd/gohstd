@@ -3,4 +3,4 @@ import {Component} from 'angular2/core';
     selector: 'gohst-app',
     template: '<h1>ello govna</h1>'
 })
-export class GohstComponent { };
+export class AppComponent { };
