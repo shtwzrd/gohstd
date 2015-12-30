@@ -1,1 +1,1 @@
-web: gohstd
+web: npm install && npm run build && gohstd
