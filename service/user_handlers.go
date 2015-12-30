@@ -8,12 +8,6 @@ import (
 	"net/http"
 )
 
-/*
-* handlers are functions mapped to a route, which take *http.Request and a
-* http.ResponseWriter. They are ultimately responsible for taking the Request
-* and constructing the appropriate Response.
- */
-
 func UserRegister(w http.ResponseWriter, r *http.Request) {
 	var u gohst.User
 	err := ParseJsonEntity(r, &u)
@@ -42,8 +36,12 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+// UserLogin is a do-nothing endpoint that merely confirms that authentication
+// was successful. To that end, it is necessary that the endpoint is wrapped in
+// actual authentication middleware.
 func UserLogin(w http.ResponseWriter, r *http.Request) {
-	panic("Not yet implemented")
+	w.WriteHeader(http.StatusOK)
+	return
 }
 
 func UserShow(w http.ResponseWriter, r *http.Request) {

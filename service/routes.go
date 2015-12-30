@@ -48,7 +48,7 @@ func NewRouter(cmd gohst.CommandRepo, user gohst.UserRepo) *mux.Router {
 	}
 
 	// Serve the web application on the root path
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./webapp/app")))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./webapp")))
 	return router
 }
 
