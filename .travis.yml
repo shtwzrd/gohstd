@@ -8,7 +8,6 @@ install:
   - npm install
   - npm run build
 script:
-  - npm run build
   - export GOPATH=${TRAVIS_BUILD_DIR}/Godeps/_workspace:$GOPATH
   - export PATH=${TRAVIS_BUILD_DIR}/Godeps/_workspace/bin:$PATH
   - go get -t github.com/tools/godep
