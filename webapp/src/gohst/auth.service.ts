@@ -1,26 +1,29 @@
-import {Http, HTTP_PROVIDERS} from 'angular2/http';
+import {Injectable} from 'angular2/core';
+import {Http, Headers, HTTP_PROVIDERS} from 'angular2/http';
+
+@Injectable()
 export class AuthService {
-    constructor(
-        private _backend: BackendService,
-        private _logger: Logger) { }
 
-    private _username:string = "";
-    private _password:string = "";
-    private _authenticated:bool = false;
+    private _http :Http;
+    private _username :string = "";
+    private _password :string = "";
+    private _authenticated :boolean = false;
 
-    authenticate(username, password :string) :bool {
-        var headers = new Headers();
-        headers.append('Authorization', 'Basic ' + btoa(username + ':' + password));
-        http.get('/api/users/login');
+    constructor(http :Http) {
+        this._http = http;
     }
 
-    needsCredentials() :boolean {}
-    getAuthHeader() :string {}
-    getHeroes() {
-        this._backend.getAll(Hero).then( (heroes:Hero[]) => {
-            this._logger.log(`Fetched ${heroes.length} heroes.`);
-            this._heroes.push(...heroes); // fill cache
-        });
-        return this._heroes;
+    authenticate(username, password :string) :boolean {
+        var headers = new Headers();
+        headers.append('Authorization', 'Basic ' + btoa(username + ':' + password));
+        this._http.get('/api/users/login');
+        return false;
+    }
+
+    needsCredentials() :boolean {
+        return false;
+    }
+    getAuthHeader() :string {
+        return ""
     }
 }

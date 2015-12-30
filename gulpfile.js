@@ -17,6 +17,7 @@ const paths = {
   lib: {
     src: [
       'node_modules/angular2/bundles/angular2.{js,min.js}',
+      'node_modules/angular2/http.{js,min.js}',
       'node_modules/angular2/bundles/angular2-polyfills.{js,min.js}',
       'node_modules/angular2/bundles/http.{js,min.js}',
       'node_modules/angular2/bundles/router.{js,min.js}',
