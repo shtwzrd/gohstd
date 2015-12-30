@@ -14,7 +14,8 @@ _or_
    `cd gohstd` 
    `go build`
 4. (_Optional_) Build the web application
-   `./node_modules/.bin/gulp build`
+   `npm install`
+   `npm run build`
 
 ## Installation
 

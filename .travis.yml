@@ -6,6 +6,7 @@ install:
   - nvm install stable
   - nvm use stable
   - npm install
+  - npm run build
 script:
   - ./node_modules/.bin/gulp test
   - export GOPATH=${TRAVIS_BUILD_DIR}/Godeps/_workspace:$GOPATH
