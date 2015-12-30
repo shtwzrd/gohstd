@@ -10,8 +10,8 @@
         "clean": "rimraf ./webapp/**/*.js && rimraf ./webapp/**/*.js.map",
         "tsc": "tsc",
         "tsc:w": "tsc -w",
-        "copy:deps": "cp node_modules/angular2/bundles/angular2-polyfills.js ./webapp && cp node_modules/systemjs/dist/system.src.js ./webapp && cp node_modules/rxjs/bundles/Rx.js ./webapp && cp node_modules/angular2/bundles/angular2.dev.js ./webapp && cp node_modules/angular2/bundles/router.dev.js ./webapp && cp node_modules/es6-shim/es6-shim.js ./webapp",
-        "build" : "npm run tsc && npm run copy:deps",
+        "copy:deps": "cp node_modules/angular2/bundles/angular2-polyfills.js ./webapp && cp node_modules/systemjs/dist/system-polyfills.js ./webapp && cp node_modules/systemjs/dist/system.src.js ./webapp && cp node_modules/rxjs/bundles/Rx.js ./webapp && cp node_modules/angular2/bundles/angular2.dev.js ./webapp && cp node_modules/angular2/bundles/router.dev.js ./webapp && cp node_modules/es6-shim/es6-shim.js ./webapp",
+        "build" : "npm run copy:deps && npm run tsc",
         "lite": "npm run copy:deps && lite-server --baseDir ./webapp",
         "start": "concurrent \"npm run tsc:w\" \"npm run lite\" "
     },
