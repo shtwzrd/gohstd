@@ -45,7 +45,7 @@ func init() {
 // authorization on a request before furthering the request to its actual handler.
 // It consults the AuthenticationBlackList and AuthorizationBlackList to know
 // whether to apply one, both or neither of these steps. Auth may short-circuit
-// a request, returning http status codes 400, 401 or 403. Otherwise, the request
+// a request, returning http status codes 401 or 403. Otherwise, the request
 //is handled as normal by the inner handler.
 func Auth(inner http.Handler, route string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,10 @@ func Auth(inner http.Handler, route string) http.Handler {
 		}
 		username, password, ok := r.BasicAuth()
 		if !ok {
-			HttpError(w, http.StatusBadRequest, errors.New(g.InvalidBasicAuthError))
+			log.Println(r)
+			log.Println(username)
+			log.Println(password)
+			HttpError(w, http.StatusUnauthorized, errors.New(g.InvalidBasicAuthError))
 			return
 		}
 		authenticated := Authenticate(username, password)

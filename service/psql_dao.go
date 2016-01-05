@@ -74,8 +74,8 @@ func (r *PsqlDao) EnsurePool(user string) *sql.DB {
 	if !exists {
 		var err error
 		r.dao[user], err = sql.Open("postgres", r.conn)
-		r.dao[user].SetMaxOpenConns(5)
-		r.dao[user].SetMaxIdleConns(1)
+		r.dao[user].SetMaxOpenConns(2)
+		r.dao[user].SetMaxIdleConns(0)
 
 		if err != nil {
 			log.Fatal(err)

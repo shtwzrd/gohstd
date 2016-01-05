@@ -61,7 +61,7 @@ var routes = Routes{
 	},
 	Route{
 		"UserLogin",
-		"POST",
+		"GET",
 		"/api/users/login",
 		UserLogin,
 	},
