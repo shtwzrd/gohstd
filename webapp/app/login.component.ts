@@ -21,9 +21,11 @@ export class LoginComponent {
         this.authService.authenticate(this.model.username, this.model.password)
             .then((success :any) => {
                 if (!success) {
+                    this.loggedIn = false;
                     alert("Username and password do not match");
+                } else {
+                    this.loggedIn = true;
                 }
-                this.loggedIn = !this.loggedIn;
             });
     }
 }
