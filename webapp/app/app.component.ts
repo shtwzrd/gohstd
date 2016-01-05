@@ -3,6 +3,7 @@ import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router'
 import {HeroesComponent} from './heroes.component';
 import {HeroDetailComponent} from './hero-detail.component';
 import {AboutComponent} from './about.component';
+import {LoginComponent} from './login.component';
 import {HeroService} from './hero.service';
 import {AuthService} from './auth.service';
 
@@ -15,10 +16,12 @@ import {AuthService} from './auth.service';
       <a [routerLink]="['/History']">History</a>
       <a [routerLink]="['/Posts']">Posts</a>
     </nav>
+        <gohst-login>
+        </gohst-login>
     <router-outlet></router-outlet>
   `,
   styleUrls: ['app/app.component.css'],
-  directives: [ROUTER_DIRECTIVES],
+    directives: [ROUTER_DIRECTIVES, LoginComponent],
   providers: [AuthService, HeroService]
 })
 @RouteConfig([

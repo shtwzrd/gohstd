@@ -1,17 +1,24 @@
-<div class="login" *ngIf="authService.authenticated == false">
-    <h2>Login</h2>
-    <form role="form" (submit)="submitLogin($event, username.value, password.value)">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" #username class="form-control" id="username" placeholder="Username">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" #password class="form-control" id="password" placeholder="Password">
-        </div>
-        <button type="submit" class="btn btn-default">Submit</button>
-    </form>
-</div>
-<div class="login" *ngIf="authService.authenticated">
-    <p>Logged in!</p>
+<div class="container">
+    <h3>Login</h3>
+    <div class="login" [hidden]="loggedIn">
+        <form role="form" (ngSubmit)="submitLogin()" #loginForm="ngForm">
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" placeholder="Username"
+                       [(ngModel)]="model.username" ngControl="username" required #username="ngForm" >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="text" class="form-control" placeholder="Password"
+                       [(ngModel)]="model.password" ngControl="password" required #password="ngForm" >
+            </div>
+
+            <button type="submit" class="btn btn-default">Login</button>
+        </form>
+    </div>
+    <div class="login" [hidden]="!loggedIn">
+        <p>Logged in!</p>
+    </div>
 </div>

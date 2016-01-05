@@ -1,5 +1,7 @@
 import {Component} from 'angular2/core';
+import {NgForm} from 'angular2/common';
 import {AuthService} from './auth.service';
+import {Credentials} from './credentials';
 
 @Component({
     selector: 'gohst-login',
@@ -7,16 +9,21 @@ import {AuthService} from './auth.service';
     styleUrls: ['app/login.component.css'],
     providers: [AuthService]
 })
-
 export class LoginComponent {
+    loggedIn :boolean;
+    model = new Credentials("","");
 
-    constructor(private authService :AuthService) {}
+    constructor(private authService :AuthService) {
+        this.loggedIn = false;
+    }
 
-    submitLogin(event :any, username :string, password :string) {
-        var success = this.authService.authenticate(username, password);
-        if (!success) {
-            alert("Username and password do not match");
-        }
-        console.log(this.authService.authenticated);
+    submitLogin() {
+        this.authService.authenticate(this.model.username, this.model.password)
+            .then((success :any) => {
+                if (!success) {
+                    alert("Username and password do not match");
+                }
+                this.loggedIn = !this.loggedIn;
+            });
     }
 }

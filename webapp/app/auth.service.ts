@@ -7,24 +7,27 @@ export class AuthService {
         this.authenticated = false;
     }
 
-    authenticate(username :string, password :string) :boolean {
-        window.fetch('/api/users/login', {
-            headers: {
-                'Authorization': 'Basic ' + btoa(username + ':' + password)
-            }
-        })
-            .then(function (response :any) {
+    // authenticate returns a Promise, whose result will contain a boolean
+    // value; true if authentication was successful and false otherwise
+    authenticate(username :string, password :string) :Promise<boolean> {
+        var promise = new Promise(function (resolve, reject) {
+            window.fetch('/api/users/login', {
+                headers: {
+                    'Authorization': 'Basic ' + btoa(username + ':' + password)
+                }
+            }).then((response :any) => {
                 if (response.status == 200) {
                     this._username = username;
                     this._password = password;
                     this.authenticated = true;
-                    console.log(this.authenticated);
+                    resolve(true);
                 } else {
                     console.log('Authentication failure');
-                    return false;
+                    resolve(false);
                 }
-            });
-        return true;
+            })
+        });
+        return promise;
     }
 
     getAuthHeader() :string {
