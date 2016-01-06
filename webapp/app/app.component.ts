@@ -4,6 +4,7 @@ import {HeroesComponent} from './heroes.component';
 import {HeroDetailComponent} from './hero-detail.component';
 import {AboutComponent} from './about.component';
 import {LoginComponent} from './login.component';
+import {SignupComponent} from './signup.component';
 import {HeroService} from './hero.service';
 import {AuthService} from './auth.service';
 
@@ -18,10 +19,12 @@ import {AuthService} from './auth.service';
     </nav>
         <gohst-login>
         </gohst-login>
+        <gohst-signup>
+        </gohst-signup>
     <router-outlet></router-outlet>
   `,
   styleUrls: ['app/app.component.css'],
-    directives: [ROUTER_DIRECTIVES, LoginComponent],
+  directives: [ROUTER_DIRECTIVES, LoginComponent, SignupComponent],
   providers: [AuthService, HeroService]
 })
 @RouteConfig([

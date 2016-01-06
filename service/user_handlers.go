@@ -6,6 +6,7 @@ import (
 	gohst "github.com/warreq/gohstd/common"
 	bcrypt "golang.org/x/crypto/bcrypt"
 	"net/http"
+	"strings"
 )
 
 func UserRegister(w http.ResponseWriter, r *http.Request) {
@@ -16,15 +17,21 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-	if err != nil {
+	err2 := u.Validate()
+	if err2 != nil {
+		HttpError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	s, err3 := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err3 != nil {
 		HttpError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	err = userRepo.InsertUser(u, s)
-	if err != nil {
-		if err.Error() == gohst.UserExistsError {
+	err4 := userRepo.InsertUser(u, s)
+	if err4 != nil {
+		if strings.Contains(err.Error(), gohst.UserExistsError) {
 			HttpError(w, http.StatusConflict,
 				errors.New(fmt.Sprintf("%s: %s", err, u.Username)))
 			return

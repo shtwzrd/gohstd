@@ -17,15 +17,18 @@ func NewPsqlUserRepo(dao PsqlDao) *PsqlUserRepo {
 	return &PsqlUserRepo{dao}
 }
 
-func (r PsqlUserRepo) InsertUser(user g.User, secret g.Secret) (err error) {
+func (r PsqlUserRepo) InsertUser(user g.User, secret g.Secret) error {
 	db := r.dao.EnsurePool(user.Username)
-	_, err = db.Exec(r.dao.Query("insert-user"),
+	_, err := db.Exec(r.dao.Query("insert-user"),
 		user.Username, user.Email, string(secret))
-	if strings.Contains(err.Error(), `duplicate key value`) {
-		return errors.New(g.UserExistsError)
+	if err != nil {
+		if strings.Contains(err.Error(), `duplicate key value`) {
+			return errors.New(g.UserExistsError)
+		} else {
+			return errors.New("Could not persist entity")
+		}
 	}
-
-	return err
+	return nil
 }
 
 func (r PsqlUserRepo) GetUserByName(uname string) (user g.User, err error) {

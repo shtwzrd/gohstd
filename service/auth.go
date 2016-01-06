@@ -53,6 +53,7 @@ func Auth(inner http.Handler, route string) http.Handler {
 		if blacklisted {
 			// Authentication isn't required -- jump directly to inner handler
 			inner.ServeHTTP(w, r)
+			return
 		}
 		username, password, ok := r.BasicAuth()
 		if !ok {
