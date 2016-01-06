@@ -1,26 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" http-equiv="content-type" content="text/html; charset=utf-8"/>
+        <link rel="stylesheet" href="styles.css">
+        <script src="es6-shim.js"></script>
+        <script src="angular2-polyfills.js"></script>
+        <script src="system-polyfills.js"></script>
+        <script src="system.src.js"></script>
+        <script src="Rx.js"></script>
+        <script src="fetch.js"></script>
+        <script src="angular2.dev.js"></script>
+        <script src="router.dev.js"></script>
+        <script>
+         System.config({packages: {app: {format: 'register',defaultExtension: 'js'}}});
+         System.import('app/boot')
+               .then(null, console.error.bind(console));
+        </script>
+    </head>
 
-<head>
-  <base href="/">
-  <link rel="stylesheet" href="styles.css">
-  <script src="es6-shim.js"></script>
-  <script src="angular2-polyfills.js"></script>
-  <script src="system-polyfills.js"></script>
-  <script src="system.src.js"></script>
-  <script src="Rx.js"></script>
-  <script src="fetch.js"></script>
-  <script src="angular2.dev.js"></script>
-  <script src="router.dev.js"></script>
-  <script>
-      System.config({packages: {app: {format: 'register',defaultExtension: 'js'}}});
-      System.import('app/boot')
-            .then(null, console.error.bind(console));
-  </script>
-</head>
-
-<body>
-  <gohst-app>Loading...</gohst-app>
-</body>
+    <body>
+        <gohst-app>Loading...</gohst-app>
+    </body>
 
 </html>
