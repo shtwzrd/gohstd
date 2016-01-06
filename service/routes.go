@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	gohst "github.com/warreq/gohstd/common"
 	"net/http"
+	"path/filepath"
 )
 
 // Route represents a URI route for the server to support. A definition of a
@@ -48,7 +49,7 @@ func NewRouter(cmd gohst.CommandRepo, user gohst.UserRepo) *mux.Router {
 	}
 
 	// Serve the web application on the root path
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./webapp")))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir(filepath.FromSlash("./webapp"))))
 	return router
 }
 
