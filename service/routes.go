@@ -27,9 +27,10 @@ var postRepo PsqlPostRepo
 
 // NewRouter constructs a *mux.Router based on the routes defined in this
 // package, which can then be passed to the net/http server.
-func NewRouter(cmd gohst.CommandRepo, user gohst.UserRepo) *mux.Router {
+func NewRouter(cmd gohst.CommandRepo, user gohst.UserRepo, post PsqlPostRepo) *mux.Router {
 	userRepo = user
 	commandRepo = cmd
+	postRepo = post
 	router := mux.NewRouter().StrictSlash(true)
 
 	for _, route := range routes {
@@ -64,7 +65,7 @@ var routes = Routes{
 	Route{
 		"SendPost",
 		"POST",
-		"/api/posts",
+		"/api/users/{username}/posts",
 		SendPost,
 	},
 	Route{

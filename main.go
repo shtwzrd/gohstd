@@ -17,6 +17,7 @@ func main() {
 	dao := *gohst.NewPsqlDao(conn)
 	cmd := *gohst.NewPsqlCommandRepo(dao)
 	user := *gohst.NewPsqlUserRepo(dao)
+	post := *gohst.NewPsqlPostRepo(dao)
 
 	port := os.Getenv("PORT") // Get Heroku assigned PORT
 	cert := os.Getenv("GOHST_CERT")
@@ -26,7 +27,7 @@ func main() {
 		port = "8080" // if not on Heroku or not defined, use 8080
 	}
 
-	router := gohst.NewRouter(cmd, user)
+	router := gohst.NewRouter(cmd, user, post)
 
 	if cert != "" && key != "" {
 		log.Fatal(http.ListenAndServeTLS(":"+port, cert, key, router))

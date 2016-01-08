@@ -33,10 +33,9 @@ func (r PsqlPostRepo) DeletePost(user string, postid int) error {
 	return err
 }
 
-func (r PsqlPostRepo) GetPosts(user string) (posts g.Posts, err error) {
-	db := r.dao.EnsurePool(user)
+func (r PsqlPostRepo) GetPosts() (posts g.Posts, err error) {
+	db := r.dao.EnsurePool(AppDB)
 	rows, err := db.Query(r.dao.Query("get-posts"))
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}

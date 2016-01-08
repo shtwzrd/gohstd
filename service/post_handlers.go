@@ -8,10 +8,7 @@ import (
 )
 
 func GetPosts(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	user := vars["username"]
-
-	posts, err := postRepo.GetPosts(user)
+	posts, err := postRepo.GetPosts()
 
 	if err != nil {
 		HttpError(w, http.StatusBadRequest, nil)
