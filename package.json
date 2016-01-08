@@ -10,8 +10,8 @@
     "clean": "rimraf ./webapp/**/*.js && rimraf ./webapp/**/*.js.map",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "copy:deps": "cp node_modules/angular2/bundles/angular2-polyfills.js ./webapp && cp node_modules/systemjs/dist/system-polyfills.js ./webapp && cp node_modules/systemjs/dist/system.src.js ./webapp && cp node_modules/rxjs/bundles/Rx.js ./webapp && cp node_modules/angular2/bundles/angular2.dev.js ./webapp && cp node_modules/angular2/bundles/router.dev.js ./webapp && cp node_modules/es6-shim/es6-shim.js ./webapp && cp node_modules/whatwg-fetch/fetch.js ./webapp",
-    "copy-win:deps": "for %I in (.\\node_modules\\angular2\\bundles\\angular2-polyfills.js .\\node_modules\\systemjs\\dist\\system-polyfills.js .\\node_modules\\systemjs\\dist\\system.src.js node_modules\\rxjs\\bundles\\Rx.js .\\node_modules\\angular2\\bundles\\angular2.dev.js .\\node_modules\\angular2\\bundles\\router.dev.js .\\node_modules\\es6-shim\\es6-shim.js  .\\node_modules\\whatwg-fetch\\fetch.js) do copy %I .\\webapp",
+    "copy:deps": "cp node_modules/angular2/bundles/angular2-polyfills.js ./webapp && cp node_modules/systemjs/dist/system-polyfills.js ./webapp && cp node_modules/systemjs/dist/system.src.js ./webapp && cp node_modules/rxjs/bundles/Rx.js ./webapp && cp node_modules/angular2/bundles/angular2.dev.js ./webapp && cp node_modules/angular2/bundles/router.dev.js ./webapp && cp node_modules/es6-shim/es6-shim.js ./webapp && cp node_modules/angular2/bundles/http.js ./webapp",
+    "copy-win:deps": "for %I in (.\\node_modules\\angular2\\bundles\\http.js .\\node_modules\\angular2\\bundles\\angular2-polyfills.js .\\node_modules\\systemjs\\dist\\system-polyfills.js .\\node_modules\\systemjs\\dist\\system.src.js node_modules\\rxjs\\bundles\\Rx.js .\\node_modules\\angular2\\bundles\\angular2.dev.js .\\node_modules\\angular2\\bundles\\router.dev.js .\\node_modules\\es6-shim\\es6-shim.js) do copy %I .\\webapp",
     "build": "npm run copy:deps && npm run tsc",
     "build-win": "npm run copy-win:deps & npm run tsc",
     "lite": "npm run copy:deps && lite-server --baseDir ./webapp",
@@ -24,7 +24,6 @@
     "reflect-metadata": "0.1.2",
     "rxjs": "^5.0.0-beta.0",
     "systemjs": "^0.19.13",
-    "whatwg-fetch": "^0.10.1",
     "zone.js": "^0.5.10"
   },
   "devDependencies": {

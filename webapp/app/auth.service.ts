@@ -1,9 +1,13 @@
-export class AuthService {
-    private username :string = "";
-    private password :string = "";
-    private authenticated :boolean;
+import {Http, Headers} from 'angular2/http';
+import {Injectable} from 'angular2/core';
 
-    constructor() {
+@Injectable()
+export class AuthService {
+    private authenticated :boolean;
+    private username :string;
+    private header :Headers;
+
+    constructor(private http :Http) {
         this.authenticated = false;
     }
 
@@ -11,34 +15,29 @@ export class AuthService {
     // value; true if authentication was successful and false otherwise
     authenticate(username :string, password :string) :Promise<boolean> {
         var promise = new Promise((resolve, reject) => {
-            window.fetch('/api/users/login', {
-                headers: {
-                    'Authorization': 'Basic ' + btoa(username + ':' + password)
-                }
-            }).then((response :any) => {
-                if (response.status == 200) {
-                    this.setCredentials(username, password);
-                    resolve(true);
-                } else {
-                    console.log('Authentication failure');
-                    resolve(false);
-                }
-            })
+            var h = new Headers();
+            h.append('Authorization', 'Basic ' + btoa(username + ':' + password));
+            this.http.get('/api/users/login', {headers: h})
+                .map(res => res.status)
+                .subscribe(data => {
+                    if (data == 200) {
+                        this.header = h;
+                        this.username = username;
+                        this.authenticated = true;
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                });
         });
         return promise;
     }
 
-    setCredentials(username :string, password :string) {
-        this.username = username;
-        this.password = password;
-        this.authenticated = true;
-    }
-
-    getAuthHeader() :string {
+    getAuthHeader() :Headers {
         if (!this.authenticated) {
             console.log('Error: not authenticated.')
         } else {
-            return 'Basic ' + btoa(this.username + ':' + this.password);
+            return this.header;
         }
     }
 }
