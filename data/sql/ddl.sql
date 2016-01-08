@@ -4,7 +4,24 @@ CREATE TABLE IF NOT EXISTS "user"
   username character varying(128),
   email character varying(320),
   password character varying(60),
+  isadmin boolean,
+  created timestamp without time zone,
+  image OID,
   CONSTRAINT user_pk PRIMARY KEY (username)
+);
+
+-- name: create-post-table
+CREATE TABLE IF NOT EXISTS post
+(
+  postid serial NOT NULL,
+  username character varying(128),
+  title character varying(255) NOT NULL,
+  message text,
+  "timestamp" timestamp without time zone,
+  CONSTRAINT post_pk PRIMARY KEY (postid)
+  CONSTRAINT username_fk FOREIGN KEY (username)
+           REFERENCES "user" (username) MATCH SIMPLE
+           ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 -- name: create-tag-table

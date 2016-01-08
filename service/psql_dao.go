@@ -38,6 +38,7 @@ func NewPsqlDao(conn string) *PsqlDao {
 	db.EnsurePool(AppDB)
 
 	logExec(db.dao[AppDB], (string)(db.ddl["create-user-table"]))
+	logExec(db.dao[AppDB], (string)(db.ddl["create-post-table"]))
 	logExec(db.dao[AppDB], (string)(db.ddl["create-command-table"]))
 	logExec(db.dao[AppDB], (string)(db.ddl["create-tag-table"]))
 	logExec(db.dao[AppDB], (string)(db.ddl["create-invocation-table"]))

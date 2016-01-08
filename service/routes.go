@@ -23,6 +23,7 @@ type Routes []Route
 
 var userRepo gohst.UserRepo
 var commandRepo gohst.CommandRepo
+var postRepo PsqlPostRepo
 
 // NewRouter constructs a *mux.Router based on the routes defined in this
 // package, which can then be passed to the net/http server.

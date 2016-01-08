@@ -9,6 +9,21 @@ INSERT INTO command
 VALUES ($1)
 RETURNING commandid
 
+-- name: insert-post
+INSERT INTO post
+(username, title, message, "timestamp")
+VALUES ($1, $2, $3, $4)
+RETURNING postid
+
+-- name: delete-post
+DELETE * from post
+WHERE postid=$1
+
+-- name: get-posts
+SELECT username, title, message, "timestamp"
+FROM post
+LIMIT 100
+
 -- name: insert-invocation
 INSERT INTO invocation
 (username, commandid, exitcode, "timestamp", hostname, "user", shell, directory)
