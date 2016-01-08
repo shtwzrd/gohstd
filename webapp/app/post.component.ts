@@ -1,6 +1,6 @@
 import {Component} from 'angular2/core';
 import {NgForm} from 'angular2/common';
-import {Post} from './Post';
+import {Post} from './post';
 
 @Component({
     selector: 'gohst-post',
@@ -9,7 +9,7 @@ import {Post} from './Post';
 })
 export class PostComponent {
 	model = new Post("","");
-	
+
 	submitPost(){
 		alert("okthatskm8");
 	}
