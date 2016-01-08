@@ -38,7 +38,7 @@ export class AuthService {
         if (!this.authenticated) {
             console.log('Error: not authenticated.')
         } else {
-            return btoa(this.username + ':' + this.password);
+            return 'Basic ' + btoa(this.username + ':' + this.password);
         }
     }
 }

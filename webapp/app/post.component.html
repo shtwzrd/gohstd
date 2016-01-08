@@ -1,12 +1,10 @@
 <div class="container">
-	<div>
-		<h3>Trending<h3>
-		<ul class="posts">
-				<li *ngFor="#post of posts">
-				<span class="postarea"> {{post.title}} </span> {{post.message}}
-			</li>
-		</ul>
-	</div>
+    <h3>Trending</h3>
+    <ul class="posts">
+        <li *ngFor="#post of posts">
+            <span class="postarea"> {{post.title}} </span> {{post.message}}
+        </li>
+    </ul>
     <div class="post">
         <h3>Post</h3>
         <form role="form" (ngSubmit)="submitPost()" #loginForm="ngForm">
