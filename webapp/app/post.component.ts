@@ -20,13 +20,26 @@ export class PostComponent implements OnInit {
     }
 
     getPosts() {
-        this.http.get('/api/posts', {headers: this.auth.getAuthHeader()})
+        this.http.get('/api/posts', {headers: this.auth.getHeader()})
             .map((res :Response) => res.json())
             .subscribe((posts :Array<Post>) => this.posts = posts);
     }
 
     submitPost() {
-        alert("okthatskm8");
+        this.http.post('/api/users/' + this.auth.username + '/posts',
+                       JSON.stringify(this.model),
+                       {headers: this.auth.getHeader()})
+            .map(res => res.status)
+            .subscribe(
+                data => {
+                    if (data == 200) {
+                        this.model.message = ""
+                        this.model.title = ""
+                        this.getPosts()
+                    }
+                },
+                err => alert(err)
+            );
     }
 
     ngOnInit() {

@@ -4,7 +4,7 @@ import {Injectable} from 'angular2/core';
 @Injectable()
 export class AuthService {
     private authenticated :boolean;
-    private username :string;
+    public username :string;
     private header :Headers;
 
     constructor(private http :Http) {
@@ -33,7 +33,7 @@ export class AuthService {
         return promise;
     }
 
-    getAuthHeader() :Headers {
+    getHeader() :Headers {
         if (!this.authenticated) {
             console.log('Error: not authenticated.')
         } else {

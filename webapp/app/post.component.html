@@ -4,7 +4,8 @@
         <li *ngFor="#post of posts">
             <div class="post">
                 <h4>{{post.title}}</h4>
-                {{post.message}}
+                <p>{{post.message}}</p>
+                <span>--{{post.username}}@{{post.timestamp}}</span>
             </div>
         </li>
     </ul>
