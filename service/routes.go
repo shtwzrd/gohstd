@@ -56,6 +56,18 @@ func NewRouter(cmd gohst.CommandRepo, user gohst.UserRepo) *mux.Router {
 
 var routes = Routes{
 	Route{
+		"GetPosts",
+		"GET",
+		"/api/posts",
+		GetPosts,
+	},
+	Route{
+		"SendPost",
+		"POST",
+		"/api/posts",
+		SendPost,
+	},
+	Route{
 		"UserRegister",
 		"POST",
 		"/api/users/register",

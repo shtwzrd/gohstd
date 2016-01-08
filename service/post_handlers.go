@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	gohst "github.com/warreq/gohstd/common"
-	"html/template"
 	"net/http"
 )
 
