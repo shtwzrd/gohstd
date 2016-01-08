@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS post
   title character varying(255) NOT NULL,
   message text,
   "timestamp" timestamp without time zone,
-  CONSTRAINT post_pk PRIMARY KEY (postid)
+  CONSTRAINT post_pk PRIMARY KEY (postid),
   CONSTRAINT username_fk FOREIGN KEY (username)
            REFERENCES "user" (username) MATCH SIMPLE
            ON UPDATE NO ACTION ON DELETE NO ACTION
