@@ -20,12 +20,16 @@ export class PostComponent implements OnInit {
     }
 
     getPosts() {
-        this.http.get('/api/posts', {headers: this.auth.getHeader()})
+        this.http.get('/api/posts')
             .map((res :Response) => res.json())
             .subscribe((posts :Array<Post>) => this.posts = posts);
     }
 
     submitPost() {
+        if (!this.auth.authenticated) {
+            alert("You must log in before submitting a post.");
+            return;
+        }
         this.http.post('/api/users/' + this.auth.username + '/posts',
                        JSON.stringify(this.model),
                        {headers: this.auth.getHeader()})

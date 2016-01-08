@@ -3,7 +3,7 @@ import {Injectable} from 'angular2/core';
 
 @Injectable()
 export class AuthService {
-    private authenticated :boolean;
+    public authenticated :boolean;
     public username :string;
     private header :Headers;
 

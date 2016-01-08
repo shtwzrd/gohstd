@@ -28,6 +28,7 @@ var AuthorizationFilters map[string][]AuthorizationFilter
 func init() {
 	AuthenticationBlackList = map[string]struct{}{
 		"UserRegister": {},
+		"GetPosts":     {},
 	}
 
 	AuthorizationFilters = map[string][]AuthorizationFilter{
