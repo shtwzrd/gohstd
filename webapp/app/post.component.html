@@ -1,6 +1,7 @@
 <div class="container">
     <h3>Trending</h3>
     <ul class="posts">
+        {{posts}}
         <li *ngFor="#post of posts">
             <span class="postarea"> {{post.title}} </span> {{post.message}}
         </li>

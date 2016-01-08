@@ -1,38 +1,31 @@
 import {Component, OnInit} from 'angular2/core';
 import {NgForm} from 'angular2/common';
 import {Post} from './post';
-import {AuthService} from './auth.service'
+import {PostService} from './post.service'
 
 @Component({
     selector: 'gohst-post',
     templateUrl: 'app/post.component.html',
-    styleUrls: ['app/post.component.css']
+    styleUrls: ['app/post.component.css'],
+    providers: [PostService]
 })
-export class PostComponent implements OnInit  {
+export class PostComponent implements OnInit {
     public posts: Post[]
+    model = new NewPost("","");
 
-    model = new Post("","");
-    constructor(public authService :AuthService){
-        this.getPosts();
+    constructor(private postService :PostService){
+        this.posts = [];
     }
 
     getPosts(){
-        window.fetch('/api/posts',	{
-            headers: {
-                'Authorization': this.authService.getAuthHeader()
-            }
-        }).then((response :any) => {
-            this.posts = response.body;
-        }).catch((response :any) => {
-            alert(response);
-        });
+        this.postService.getPosts().then(posts => this.posts = posts);
     }
+
+    submitPost(){
+		    alert("okthatskm8");
+	  }
 
     ngOnInit(){
         this.getPosts();
     }
-
-	  submitPost(){
-		    alert("okthatskm8");
-	  }
 }
