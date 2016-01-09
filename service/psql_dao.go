@@ -2,10 +2,12 @@ package service
 
 import (
 	"database/sql"
+	"github.com/kardianos/osext"
 	_ "github.com/lib/pq"
 	"github.com/nleof/goyesql"
 	"log"
 	"os"
+	"path"
 )
 
 // PsqlDao is an entity that implements per-user connection pool limits and
@@ -33,7 +35,12 @@ func NewPsqlDao(conn string) *PsqlDao {
 	db.dao = make(map[string]*sql.DB)
 
 	// Create all the Tables, Views if they do not exist
-	db.ddl = goyesql.MustParseFile("data/sql/ddl.sql")
+	execPath, err := osext.ExecutableFolder()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(execPath)
+	db.ddl = goyesql.MustParseFile(path.Join(execPath, "data/sql/ddl.sql"))
 
 	db.EnsurePool(AppDB)
 
@@ -47,7 +54,7 @@ func NewPsqlDao(conn string) *PsqlDao {
 	logExec(db.dao[AppDB], (string)(db.ddl["create-timestamp-index"]))
 
 	// Load all data-manipulation queries
-	db.dml = goyesql.MustParseFile("data/sql/queries.sql")
+	db.dml = goyesql.MustParseFile(path.Join(execPath, "data/sql/queries.sql"))
 
 	log.Println("storage init completed")
 	return &db

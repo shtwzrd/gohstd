@@ -3,12 +3,21 @@
 	"GoVersion": "go1.5.2",
 	"Deps": [
 		{
+			"ImportPath": "github.com/asaskevich/govalidator",
+			"Comment": "v2-45-g1295808",
+			"Rev": "129580890d97de923d9d9aec06cb1aa771812aff"
+		},
+		{
 			"ImportPath": "github.com/gorilla/context",
 			"Rev": "1c83b3eabd45b6d76072b66b746c20815fb2872d"
 		},
 		{
 			"ImportPath": "github.com/gorilla/mux",
 			"Rev": "9c068cf16d982f8bd444b8c352acbeec34c4fe5b"
+		},
+		{
+			"ImportPath": "github.com/kardianos/osext",
+			"Rev": "29ae4ffbc9a6fe9fb2bc5029050ce6996ea1d3bc"
 		},
 		{
 			"ImportPath": "github.com/lib/pq",
@@ -18,6 +27,14 @@
 		{
 			"ImportPath": "github.com/nleof/goyesql",
 			"Rev": "382ae834dff1619ed95fb4b4be9869d3b12488ed"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "f18420efc3b4f8e9f3d51f6bd2476e92c46260e9"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "f18420efc3b4f8e9f3d51f6bd2476e92c46260e9"
 		}
 	]
 }
