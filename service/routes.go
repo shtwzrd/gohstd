@@ -4,8 +4,11 @@ package service
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/kardianos/osext"
 	gohst "github.com/warreq/gohstd/common"
+	"log"
 	"net/http"
+	"path"
 	"path/filepath"
 )
 
@@ -51,7 +54,14 @@ func NewRouter(cmd gohst.CommandRepo, user gohst.UserRepo, post PsqlPostRepo) *m
 	}
 
 	// Serve the web application on the root path
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir(filepath.FromSlash("./webapp"))))
+	execPath, err := osext.ExecutableFolder()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	appPath := filepath.FromSlash(path.Join(execPath, "webapp"))
+
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir(appPath)))
 	return router
 }
 
