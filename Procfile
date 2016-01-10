@@ -1,1 +1,1 @@
-web: npm run build && cp gohstd ../ && ../gohstd
+web: npm run build && cp ./gohstd ../ && ../gohstd
