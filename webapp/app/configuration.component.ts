@@ -1,8 +1,9 @@
 import {Component,OnChanges, SimpleChange,} from 'angular2/core';
 import {NgForm} from 'angular2/common';
+import {Http, Response, HTTP_PROVIDERS} from 'angular2/http';
 import {Configuration, NewConfiguration} from './configuration';
 import {FILE_UPLOAD_DIRECTIVES, FileUploader} from 'ng2-file-upload';
-
+import {AuthService} from './auth.service';
 
 @Component({
   selector: 'gohst-configuration',
@@ -11,8 +12,15 @@ import {FILE_UPLOAD_DIRECTIVES, FileUploader} from 'ng2-file-upload';
 export class ConfigurationComponent {
 	model = new NewConfiguration("");
 	
+    constructor(private http :Http, private auth :AuthService){
+     
+    }
+	
 	submitConfiguration(){
-		console.log(this.model);
+        if (!this.auth.authenticated) {
+            alert("You must log in before submitting your configuration.");
+            return;
+        }
 	}
 	
 	picturePreview(){
