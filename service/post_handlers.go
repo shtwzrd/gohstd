@@ -17,7 +17,10 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewEncoder(w).Encode(posts); err != nil {
 		HttpError(w, http.StatusInternalServerError, nil)
+		return
 	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func SendPost(w http.ResponseWriter, r *http.Request) {

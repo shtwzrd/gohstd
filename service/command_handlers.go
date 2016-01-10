@@ -47,7 +47,10 @@ func CommandIndex(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewEncoder(w).Encode(commands); err != nil {
 		HttpError(w, http.StatusInternalServerError, nil)
+		return
 	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func CommandCreate(w http.ResponseWriter, r *http.Request) {
