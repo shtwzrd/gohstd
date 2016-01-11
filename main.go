@@ -31,8 +31,12 @@ func main() {
 	router := gohst.NewRouter(cmd, user, post)
 
 	if cert != "" && key != "" {
+		// Set up a listener for HTTP requests that redirect to HTTPS
 		if httpOnlyPort != "" {
-			go log.Fatal(http.ListenAndServe(":"+httpOnlyPort, nil))
+			redir := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				http.Redirect(w, r, "https://"+r.Host, http.StatusMovedPermanently)
+			})
+			go log.Fatal(http.ListenAndServe(":"+httpOnlyPort, redir))
 		}
 		log.Fatal(http.ListenAndServeTLS(":"+port, cert, key, router))
 	} else {
