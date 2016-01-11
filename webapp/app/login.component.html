@@ -5,7 +5,7 @@
 
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" class="form-control" placeholder="Username"
+                <input id="username" value="" type="text" class="form-control" placeholder="Username"
                        [(ngModel)]="model.username" ngControl="username" required #username="ngForm" >
             </div>
 
@@ -15,7 +15,7 @@
                        [(ngModel)]="model.password" ngControl="password" required #password="ngForm" >
             </div>
 			<div class="form-group">
-				<input type="checkbox" class="form-control">
+				<input id="rmb" type="checkbox" class="form-control">
 				<label for="rmb">Remember me</label>
 			</div>
             <button type="submit" class="btn btn-default">Login</button> 
