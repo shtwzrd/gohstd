@@ -37,11 +37,21 @@ func CommandIndex(w http.ResponseWriter, r *http.Request) {
 	var commands interface{}
 	if verbose {
 		commands, err = commandRepo.GetInvocations(user, pageSize)
+		if err != nil {
+			HttpError(w, http.StatusBadRequest, err)
+			return
+		}
+		commands, err = InvocationsFromBase64(commands.(gohst.Invocations))
 	} else {
 		commands, err = commandRepo.GetCommands(user, pageSize)
+		if err != nil {
+			HttpError(w, http.StatusBadRequest, err)
+			return
+		}
+		commands, err = CommandsFromBase64(commands.(gohst.Commands))
 	}
 	if err != nil {
-		HttpError(w, http.StatusBadRequest, nil)
+		HttpError(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -59,6 +69,7 @@ func CommandCreate(w http.ResponseWriter, r *http.Request) {
 
 	var inv gohst.Invocations
 	err := ParseJsonEntity(r, &inv)
+	inv = InvocationsToBase64(inv)
 
 	if err != nil {
 		HttpError(w, http.StatusBadRequest, err)
