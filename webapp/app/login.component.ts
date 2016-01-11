@@ -21,4 +21,7 @@ export class LoginComponent {
                 }
             });
     }
+	showSignup(){
+		(<HTMLElement>document.getElementsByClassName('container')[1]).style.display = "block";
+	}
 }
