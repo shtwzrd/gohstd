@@ -20,6 +20,7 @@ func main() {
 	post := *gohst.NewPsqlPostRepo(dao)
 
 	port := os.Getenv("PORT") // Get Heroku assigned PORT
+	httpOnlyPort := os.Getenv("HTTP_ONLY_PORT")
 	cert := os.Getenv("GOHST_CERT")
 	key := os.Getenv("GOHST_KEY")
 
@@ -30,6 +31,9 @@ func main() {
 	router := gohst.NewRouter(cmd, user, post)
 
 	if cert != "" && key != "" {
+		if httpOnlyPort != "" {
+			go log.Fatal(http.ListenAndServe(":"+httpOnlyPort, nil))
+		}
 		log.Fatal(http.ListenAndServeTLS(":"+port, cert, key, router))
 	} else {
 		log.Fatal(http.ListenAndServe(":"+port, router))
