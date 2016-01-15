@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "user"
   password character varying(60),
   isadmin boolean,
   created timestamp without time zone,
-  image OID,
+  imagelocation character varying(255),
   CONSTRAINT user_pk PRIMARY KEY (username)
 );
 

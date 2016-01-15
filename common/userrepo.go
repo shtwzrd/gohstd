@@ -10,4 +10,6 @@ type UserRepo interface {
 	// GetUserByName queries the storage for a representation of a User, returning
 	// nil and an error if the user does not exist
 	GetUserByName(username string) (user User, err error)
+
+	UpdateUserPicture(username string, location string) error
 }

@@ -91,6 +91,12 @@ var routes = Routes{
 		UserLogin,
 	},
 	Route{
+		"UserUpdatePicture",
+		"POST",
+		"/api/users/{username}/picture",
+		UserUploadProfilePicture,
+	},
+	Route{
 		"UserShow",
 		"GET",
 		"/api/users/{username}",

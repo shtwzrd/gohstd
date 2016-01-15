@@ -31,6 +31,15 @@ func (r PsqlUserRepo) InsertUser(user g.User, secret g.Secret) error {
 	return nil
 }
 
+func (r PsqlUserRepo) UpdateUserPicture(user string, location string) error {
+	db := r.dao.EnsurePool(user)
+	_, err := db.Exec(r.dao.Query("update-user-image"), user, location)
+	if err != nil {
+		return errors.New("Could not update user's image")
+	}
+	return nil
+}
+
 func (r PsqlUserRepo) GetUserByName(uname string) (user g.User, err error) {
 	db := r.dao.EnsurePool(uname)
 	var email string

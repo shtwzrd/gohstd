@@ -68,3 +68,9 @@ VALUES ($1, $2, $3)
 SELECT email, password
 FROM "user"
 WHERE username = $1
+
+-- name: update-user-image
+UPDATE "user"
+SET imagelocation = $1
+WHERE username = $2
+

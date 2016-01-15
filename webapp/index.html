@@ -11,7 +11,15 @@
         <script src="http.js"></script>
         <script src="router.dev.js"></script>
         <script>
-         System.config({packages: {app: {format: 'register',defaultExtension: 'js'}}});
+         System.config(
+             {
+                 packages: {
+                     "app": {
+                         format: 'register',
+                         defaultExtension: 'js'
+                     }
+                 }
+             });
          System.import('app/boot')
                .then(null, console.error.bind(console));
         </script>
