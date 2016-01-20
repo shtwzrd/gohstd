@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/warreq/gohstd",
-	"GoVersion": "go1.5.2",
+	"GoVersion": "go1.5.3",
 	"Deps": [
 		{
 			"ImportPath": "github.com/asaskevich/govalidator",
