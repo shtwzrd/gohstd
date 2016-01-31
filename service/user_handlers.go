@@ -3,17 +3,10 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/gorilla/mux"
 	gohst "github.com/warreq/gohstd/common"
 	bcrypt "golang.org/x/crypto/bcrypt"
-	"image/jpeg"
-	"image/png"
-	"io"
 	"net/http"
-	"os"
-	"path"
 	"strings"
-	"time"
 )
 
 func UserRegister(w http.ResponseWriter, r *http.Request) {
@@ -56,63 +49,6 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 func UserLogin(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	return
-}
-
-func UserUploadProfilePicture(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	user := vars["username"]
-
-	src, hdr, err := r.FormFile("photo")
-	if err != nil {
-		if err == http.ErrMissingFile || err == http.ErrNotMultipart {
-			HttpError(w, http.StatusBadRequest, err)
-			return
-		}
-	}
-	defer src.Close()
-
-	contentType := hdr.Header["Content-Type"][0]
-	if contentType != "image/png" && contentType != "image/jpg" {
-		HttpError(w, http.StatusBadRequest, errors.New("File must be png or jpg"))
-		return
-	}
-
-	filename := fmt.Sprintf("%s-%d", user, time.Now().Unix())
-	err = os.MkdirAll("./images", 0666)
-	if err != nil {
-		HttpError(w, http.StatusInternalServerError, errors.New(""))
-		return
-	}
-
-	if contentType == "image/png" {
-		filename += ".png"
-		_, err = png.Decode(src)
-	} else {
-		filename += ".jpg"
-		_, err = jpeg.Decode(src)
-	}
-
-	if err != nil {
-		HttpError(w, http.StatusBadRequest, err)
-		return
-	}
-
-	src.Seek(0, 0)
-	dst, err := os.Create(path.Join("./images", filename))
-
-	if err != nil {
-		HttpError(w, http.StatusBadRequest, err)
-		return
-	}
-
-	defer dst.Close()
-	_, err = io.Copy(dst, src)
-	if err != nil {
-		HttpError(w, http.StatusBadRequest, err)
-		return
-	}
-	userRepo.UpdateUserPicture(user, path.Join("./images", filename))
-
 }
 
 func UserShow(w http.ResponseWriter, r *http.Request) {

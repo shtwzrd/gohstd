@@ -4,8 +4,6 @@ import {AboutComponent} from './about.component';
 import {LoginComponent} from './login.component';
 import {SignupComponent} from './signup.component';
 import {AuthService} from './auth.service';
-import {PostComponent} from './post.component';
-import {ConfigurationComponent} from './configuration.component';
 
 @Component({
   selector: 'gohst-app',
@@ -13,8 +11,6 @@ import {ConfigurationComponent} from './configuration.component';
     <h1>{{title}}</h1>
     <nav>
       <a [routerLink]="['/About']">About</a>
-	  <a [routerLink]="['/Posts']">Posts</a>
-	  <a [routerLink]="['/Configuration']">Configuration</a>
     </nav>
         <gohst-login>
         </gohst-login>
@@ -27,9 +23,7 @@ import {ConfigurationComponent} from './configuration.component';
   providers: [AuthService]
 })
 @RouteConfig([
-  {path: '/about', as: 'About', component: AboutComponent, useAsDefault: true},
-  {path: '/post', as: 'Posts', component: PostComponent},
-  {path: '/configuration', as: 'Configuration', component: ConfigurationComponent}
+  {path: '/about', as: 'About', component: AboutComponent, useAsDefault: true}
 ])
 export class AppComponent {
   public title = 'gohst';

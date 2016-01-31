@@ -17,7 +17,6 @@ func main() {
 	dao := *gohst.NewPsqlDao(conn)
 	cmd := *gohst.NewPsqlCommandRepo(dao)
 	user := *gohst.NewPsqlUserRepo(dao)
-	post := *gohst.NewPsqlPostRepo(dao)
 
 	port := os.Getenv("PORT") // Get Heroku assigned PORT
 	httpOnlyPort := os.Getenv("HTTP_ONLY_PORT")
@@ -28,7 +27,7 @@ func main() {
 		port = "8080" // if not on Heroku or not defined, use 8080
 	}
 
-	router := gohst.NewRouter(cmd, user, post)
+	router := gohst.NewRouter(cmd, user)
 
 	if cert != "" && key != "" {
 		// Set up a listener for HTTP requests that redirect to HTTPS
